@@ -1,0 +1,144 @@
+import 'package:flutter/material.dart';
+import 'package:japan_front/model/Kaigi.dart';
+import 'package:japan_front/network.dart';
+
+void main() => runApp(MyApp());
+
+class MyApp extends StatefulWidget {
+  const MyApp({Key? key}) : super(key: key);
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  late Future<List<Kangi>> futureKangi;
+  bool pressOnUndoc = false;
+  bool pressOnHundoc = false;
+  bool pressOnKorea = false;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    Network network = new Network("http://localhost:4000/kangi");
+
+    futureKangi = network.fetchData(2);
+    print(futureKangi);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+        home: Scaffold(
+      body: Center(
+        child: FutureBuilder<Kangi>(
+          future: futureKangi,
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    snapshot.data!.japan,
+                    style: TextStyle(fontSize: 100),
+                  ),
+                  SizedBox(
+                    height: 40,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      RaisedButton(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20.0),
+                        ),
+                        child: pressOnUndoc
+                            ? Text("음독")
+                            : Text(snapshot.data!.undoc),
+                        onPressed: () {
+                          setState(() {
+                            pressOnUndoc = !pressOnUndoc;
+                          });
+                        },
+                      ),
+                      SizedBox(
+                        width: 20,
+                      ),
+                      RaisedButton(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20.0),
+                        ),
+                        child: pressOnHundoc
+                            ? Text("훈독")
+                            : Text(snapshot.data!.hundoc),
+                        onPressed: () {
+                          setState(() {
+                            pressOnHundoc = !pressOnHundoc;
+                          });
+                        },
+                      ),
+                      SizedBox(
+                        width: 20,
+                      ),
+                      RaisedButton(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20.0),
+                        ),
+                        child: pressOnKorea
+                            ? Text("읽는 법")
+                            : Text(snapshot.data!.korea),
+                        onPressed: () {
+                          setState(() {
+                            pressOnKorea = !pressOnKorea;
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                  SizedBox(
+                    height: 30,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      RaisedButton(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20.0),
+                        ),
+                        child: Text("알고 있습니다."),
+                        onPressed: () {
+                          setState(() {
+                            pressOnKorea = !pressOnKorea;
+                          });
+                        },
+                      ),
+                      SizedBox(
+                        width: 20,
+                      ),
+                      RaisedButton(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20.0),
+                        ),
+                        child: Text("모르고 있습니다."),
+                        onPressed: () {
+                          setState(() {
+                            pressOnKorea = !pressOnKorea;
+                          });
+                        },
+                      )
+                    ],
+                  )
+                ],
+              );
+            } else if (snapshot.hasError) {
+              return Text('${snapshot.error}');
+            }
+
+            return const CircularProgressIndicator();
+          },
+        ),
+      ),
+    ));
+  }
+}
+
