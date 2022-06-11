@@ -9,7 +9,7 @@ class JapanLevelPage extends StatelessWidget {
       child: RaisedButton(
         onPressed: () {
           Navigator.push(content, MaterialPageRoute(builder: (content) {
-            return KangiList(level: level);
+            return JLPT(level: level);
           }));
         },
         color: Colors.blue,

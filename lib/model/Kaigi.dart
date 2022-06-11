@@ -15,8 +15,8 @@ class Kangi {
 
   factory Kangi.fromJson(Map<String, dynamic> json) {
     return Kangi(
-        japan: json['japan'],
-        korea: json['korea'],
+        japan: json['kangi'],
+        korea: json['mean'],
         undoc: json['undoc'],
         hundoc: json['hundoc']);
   }

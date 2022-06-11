@@ -4,28 +4,37 @@ import 'package:japan_front/model/Kaigi.dart';
 import 'package:japan_front/network.dart';
 import 'package:http/http.dart' as http;
 
-class KangiList extends StatefulWidget {
+class JLPT extends StatefulWidget {
   final int level;
-  const KangiList({Key? key, required this.level}) : super(key: key);
+  List<Kangi>? kangis;
+  JLPT({Key? key, required this.level, this.kangis}) : super(key: key);
 
   @override
-  State<KangiList> createState() => _KangiListState();
+  State<JLPT> createState() => _JLPTState();
 }
 
-class _KangiListState extends State<KangiList> {
-  List isClick = List<bool>.filled(3, true);
-
-  late int totalCount;
-  int correctCount = 0;
-
-  late List<Kangi> tempList;
-  late int number = Random().nextInt(totalCount);
+class _JLPTState extends State<JLPT> {
   late Future<List<Kangi>> futureKangis;
+  late List<Kangi> temp = [];
+  late List<Kangi> restKangis = [];
+  List isButtonCheck = List<bool>.filled(3, true);
+  Set seenJLPT = {};
+  // late int randomNumber;
+  late int totalCount;
+  int index = 0;
 
   @override
   void initState() {
     super.initState();
-    futureKangis = new Network("http://localhost:4000/kangi")
+    if (widget.kangis == null) {
+      getJLPT();
+    } else {
+      print(widget.kangis);
+    }
+  }
+
+  void getJLPT() {
+    futureKangis = new Network("http://localhost:4000/kangis/level")
         .fetchData(http.Client(), widget.level);
   }
 
@@ -41,129 +50,208 @@ class _KangiListState extends State<KangiList> {
             color: Colors.black,
           ),
           onPressed: () {
-            isClick.fillRange(0, 3, true);
             Navigator.pop(context);
           },
         ),
       ),
-      body: FutureBuilder<List<Kangi>>(
-        future: futureKangis,
-        builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            return Center(
-              child: Text(snapshot.error.toString()),
-            );
-          } else if (snapshot.hasData) {
-            tempList = snapshot.data!;
-            totalCount = tempList.length;
+      body: widget.kangis != null
+          ? null
+          : FutureBuilder<List<Kangi>>(
+              future: futureKangis,
+              builder: (context, snapshot) {
+                if (snapshot.hasError) {
+                  return Center(
+                    child: Text(snapshot.error.toString()),
+                  );
+                } else if (snapshot.hasData) {
+                  temp = snapshot.data!;
+                  totalCount = snapshot.data!.length;
+                  print(totalCount);
+                  return JLPTScreen(
+                    temp: temp,
+                  );
+                } else {
+                  return Center(child: CircularProgressIndicator());
+                }
+              },
+            ),
+    );
+  }
+}
 
-            return Scaffold(
-              body: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    snapshot.data![number].japan,
-                    style: TextStyle(fontSize: 100),
+class JLPTScreen extends StatefulWidget {
+  List<Kangi> temp;
+  JLPTScreen({Key? key, required this.temp}) : super(key: key);
+
+  @override
+  State<JLPTScreen> createState() => _JLPTScreenState();
+}
+
+class _JLPTScreenState extends State<JLPTScreen> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            widget.temp.japan,
+            style: TextStyle(fontSize: 100),
+          ),
+          SizedBox(
+            height: 40,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              TextButton(
+                style: TextButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20.0),
                   ),
-                  SizedBox(
-                    height: 40,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      RaisedButton(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20.0),
-                        ),
-                        child: isClick[0]
-                            ? Text("음독")
-                            : Text(tempList[number].undoc),
-                        onPressed: () {
-                          setState(() {
-                            isClick[0] = !isClick[0];
-                          });
-                        },
-                      ),
-                      SizedBox(
-                        width: 20,
-                      ),
-                      RaisedButton(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20.0),
-                        ),
-                        child: isClick[1]
-                            ? Text("훈독")
-                            : Text(tempList[number].hundoc),
-                        onPressed: () {
-                          setState(() {
-                            isClick[1] = !isClick[1];
-                          });
-                        },
-                      ),
-                      SizedBox(
-                        width: 20,
-                      ),
-                      RaisedButton(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20.0),
-                        ),
-                        child: isClick[2]
-                            ? Text("읽는 법")
-                            : Text(tempList[number].korea),
-                        onPressed: () {
-                          setState(() {
-                            isClick[2] = !isClick[2];
-                          });
-                        },
-                      ),
-                    ],
-                  ),
-                  SizedBox(
-                    height: 30,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      RaisedButton(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20.0),
-                        ),
-                        child: Text("知っています"),
-                        onPressed: () {
-                          if (0 == totalCount) {
-                            Navigator.pop(context);
-                          }
-                          setState(() {
-                            isClick.fillRange(0, 3, true);
-                            number = Random().nextInt(10);
-                          });
-                        },
-                      ),
-                      SizedBox(
-                        width: 20,
-                      ),
-                      RaisedButton(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20.0),
-                        ),
-                        child: Text("知っていません"),
-                        onPressed: () {
-                          setState(() {
-                            isClick.fillRange(0, 3, true);
-                            number = Random().nextInt(10);
-                          });
-                        },
-                      )
-                    ],
-                  )
-                ],
+                ),
+                child: isButtonCheck[0] ? Text("음독") : Text(widget.temp.undoc),
+                onPressed: () {
+                  setState(() {
+                    isButtonCheck[0] = !isButtonCheck[0];
+                  });
+                },
               ),
-            );
-            // ? KangiList()
-          } else {
-            return Center(child: CircularProgressIndicator());
-          }
-        },
+              SizedBox(
+                width: 20,
+              ),
+              TextButton(
+                style: TextButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20.0),
+                  ),
+                ),
+                child: isButtonCheck[1] ? Text("훈독") : Text(widget.temp.hundoc),
+                onPressed: () {
+                  setState(() {
+                    isButtonCheck[1] = !isButtonCheck[1];
+                  });
+                },
+              ),
+              SizedBox(
+                width: 20,
+              ),
+              TextButton(
+                style: TextButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20.0),
+                  ),
+                ),
+                child:
+                    isButtonCheck[2] ? Text("읽는 법") : Text(widget.temp.korea),
+                onPressed: () {
+                  setState(() {
+                    isButtonCheck[2] = !isButtonCheck[2];
+                  });
+                },
+              ),
+            ],
+          ),
+          SizedBox(
+            height: 30,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              TextButton(
+                style: TextButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20.0),
+                  ),
+                ),
+                child: Text("知っています"),
+                onPressed: () {
+                  if (index < totalCount - 1) {
+                    index++;
+                  } else {
+                    Navigator.pop(context);
+                  }
+                  setState(() {
+                    isButtonCheck.fillRange(0, 3, true);
+                  });
+                },
+              ),
+              SizedBox(
+                width: 20,
+              ),
+              TextButton(
+                style: TextButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20.0),
+                  ),
+                ),
+                child: Text("知っていません"),
+                onPressed: () {
+                  if (index < totalCount - 1) {
+                    restKangis.add(widget.temp);
+                    index++;
+                  } else {
+                    if (restKangis.isNotEmpty) {
+                      showDialog(
+                          context: context,
+                          builder: (BuildContext context2) {
+                            return AlertDialog(
+                              title: Text(
+                                "知らない単語が${restKangis.length}個残っています。",
+                                style: TextStyle(fontSize: 18),
+                              ),
+                              content: const Text(
+                                '単語を混ざろうとはOKボタンを押してください。',
+                                style: TextStyle(fontSize: 11),
+                              ),
+                              actions: <Widget>[
+                                Row(
+                                  children: [
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(context2, '다른 레벨 보기');
+                                        Navigator.pop(context);
+                                      },
+                                      child: const Text('出てきます'),
+                                    ),
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(context2, 'OK');
+                                        restKangis.shuffle();
+                                        Navigator.push(context,
+                                            MaterialPageRoute(builder: (_) {
+                                          return JLPT(
+                                            level: widget.level,
+                                            kangis: restKangis,
+                                          );
+                                        }));
+                                      },
+                                      child: const Text('混ざります。'),
+                                    ),
+                                    TextButton(
+                                      onPressed: () =>
+                                          Navigator.pop(context2, 'OK'),
+                                      child: const Text('もっと見せます'),
+                                    ),
+                                  ],
+                                )
+                              ],
+                            );
+                          });
+                    } else
+                      Navigator.pop(context);
+                  }
+                  setState(() {
+                    isButtonCheck.fillRange(0, 3, true);
+                  });
+                },
+              )
+            ],
+          ),
+          SizedBox(
+            height: 80,
+          ),
+        ],
       ),
     );
   }

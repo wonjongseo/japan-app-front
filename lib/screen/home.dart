@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:japan_front/screen/japanLevelPage.dart';
+import 'package:japan_front/screen/japanPage.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -16,12 +17,12 @@ class HomePage extends StatelessWidget {
             children: [
               Container(
                 height: 50,
-                width: 300,
+                width: 200,
                 child: RaisedButton(
                   onPressed: () {
                     Navigator.push(context,
                         MaterialPageRoute(builder: (content) {
-                      return JapanLevelPage();
+                      return JapanPage();
                     }));
                   },
                   child: Text(
@@ -34,7 +35,7 @@ class HomePage extends StatelessWidget {
               ),
               Container(
                 height: 50,
-                width: 300,
+                width: 200,
                 child: RaisedButton(
                   onPressed: () {},
                   child: Text("韓国語"),

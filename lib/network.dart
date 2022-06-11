@@ -9,13 +9,12 @@ class Network {
   Network(this.url);
 
   Future<List<Kangi>> fetchData(http.Client client, int page) async {
-    String newUrl = this.url + "?page=" + page.toString();
+    String newUrl = this.url + "?n=" + page.toString();
     print(newUrl);
     var url = Uri.parse(newUrl);
     var response = await client.get(url);
 
     print(response.body);
-    print(response.body.length);
     if (response.statusCode == 200) {
       return compute(parseKangis, response.body);
     } else {
