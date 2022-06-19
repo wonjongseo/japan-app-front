@@ -142,12 +142,179 @@ class _JLPTState extends State<JLPT> {
         ? FutureBuilder<List<Kangi>>(
             future: futureKangis,
             builder: (context, snapshot) {
-              if (snapshot.hasError) {
+              if (snapshot.hasError || snapshot.data?.length == 0) {
                 return Center(
                   child: Text(snapshot.error.toString()),
                 );
               } else if (snapshot.hasData) {
-                return SafeArea(
+                return _getSafeArea(snapshot.data!);
+              }
+              return Center(child: CircularProgressIndicator());
+            })
+        : _getSafeArea(widget.kangis!);
+  }
+
+  SafeArea _getSafeArea(List<Kangi> kangis) {
+    return SafeArea(
+      child: Scaffold(
+          appBar: AppBar(
+            title: Text(
+              'N${widget.level}',
+            ),
+            backgroundColor: Colors.black,
+            leading: IconButton(
+              icon: Icon(
+                Icons.arrow_back_ios,
+                color: Colors.white,
+              ),
+              onPressed: () {
+                _setShardData(index);
+                Navigator.pop(context);
+              },
+            ),
+          ),
+          body: Padding(
+            padding: EdgeInsets.only(top: 10, bottom: 10, left: 20, right: 20),
+            child: Container(
+                child: Center(
+              child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      flex: 1,
+                      child: Container(
+                          child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          TextButton(
+                            style: TextButton.styleFrom(
+                                //
+                                primary: Colors.pink),
+                            child: Text('連関単語'),
+                            onPressed: () {},
+                          ),
+                        ],
+                      )),
+                    ),
+                    Expanded(
+                      flex: 2,
+                      child: Container(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              child: Text(
+                                kangis[index].japan,
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 100),
+                              ),
+                            ),
+                            Container(
+                              height: 100,
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                children: [
+                                  TextButton(
+                                      style: TextButton.styleFrom(
+                                        primary: Colors.pink,
+                                      ),
+                                      onPressed: () {
+                                        setState(() {
+                                          isClick[0] = !isClick[0];
+                                        });
+                                      },
+                                      child: !isClick[0]
+                                          ? Text('운독')
+                                          : Text(kangis[index].undoc)),
+                                  TextButton(
+                                      style: TextButton.styleFrom(
+                                          primary: Colors.pink),
+                                      onPressed: () {
+                                        setState(() {
+                                          isClick[1] = !isClick[1];
+                                        });
+                                      },
+                                      child: !isClick[1]
+                                          ? Text('훈독')
+                                          : Text(kangis[index].hundoc)),
+                                  TextButton(
+                                      style: TextButton.styleFrom(
+                                          primary: Colors.pink),
+                                      onPressed: () {
+                                        setState(() {
+                                          isClick[2] = !isClick[2];
+                                        });
+                                      },
+                                      child: !isClick[2]
+                                          ? Text('한자')
+                                          : Text(kangis[index].korea)),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                        flex: 1,
+                        child: Container(
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              TextButton(
+                                  style: TextButton.styleFrom(
+                                      primary: Colors.pink),
+                                  onPressed: () {
+                                    index++;
+                                    if (index == kangis.length) {
+                                      if (restKangis.isNotEmpty) {
+                                        shoWMessage();
+                                      } else {
+                                        return Navigator.of(context)
+                                            .pop(context);
+                                      }
+                                    } else {
+                                      switchingVoca();
+                                      setState(() {});
+                                    }
+                                  },
+                                  child: Text('知っています。')),
+                              TextButton(
+                                  style: TextButton.styleFrom(
+                                      primary: Colors.pink),
+                                  onPressed: () {
+                                    restKangis.add(kangis[index]);
+                                    index++;
+                                    if (index == kangis.length) {
+                                      if (restKangis.isNotEmpty) {
+                                        shoWMessage();
+                                      } else {
+                                        return Navigator.of(context)
+                                            .pop(context);
+                                      }
+                                    } else {
+                                      switchingVoca();
+                                      setState(() {});
+                                    }
+                                  },
+                                  child: Text('知っていません。')),
+                            ],
+                          ),
+                        )),
+                  ]),
+            )),
+          )),
+    );
+  }
+}
+
+
+/*
+        return SafeArea(
                   child: Scaffold(
                       appBar: AppBar(
                         title: Text(
@@ -273,7 +440,8 @@ class _JLPTState extends State<JLPT> {
                                               style: TextButton.styleFrom(
                                                   primary: Colors.pink),
                                               onPressed: () {
-                                                if (index + 1 ==
+                                                index++;
+                                                if (index ==
                                                     snapshot.data!.length) {
                                                   if (restKangis.isNotEmpty) {
                                                     shoWMessage();
@@ -281,11 +449,10 @@ class _JLPTState extends State<JLPT> {
                                                     return Navigator.of(context)
                                                         .pop(context);
                                                   }
+                                                } else {
+                                                  switchingVoca();
+                                                  setState(() {});
                                                 }
-                                                switchingVoca();
-                                                setState(() {
-                                                  index++;
-                                                });
                                               },
                                               child: Text('知っています。')),
                                           TextButton(
@@ -316,171 +483,5 @@ class _JLPTState extends State<JLPT> {
                         )),
                       )),
                 );
-              } else {
-                return Center(child: CircularProgressIndicator());
-              }
-            })
-        : SafeArea(
-            child: Scaffold(
-                appBar: AppBar(
-                  title: Text(
-                    'N${widget.level}',
-                  ),
-                  backgroundColor: Colors.black,
-                  leading: IconButton(
-                    icon: Icon(
-                      Icons.arrow_back_ios,
-                      color: Colors.white,
-                    ),
-                    onPressed: () {
-                      // _setShardData(index);
-                      Navigator.pop(context);
-                    },
-                  ),
-                ),
-                body: Padding(
-                  padding:
-                      EdgeInsets.only(top: 10, bottom: 10, left: 20, right: 20),
-                  child: Container(
-                      child: Center(
-                    child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            flex: 1,
-                            child: Container(
-                                //height: MediaQuery.of(context).size.height / 3.3333,
-                                child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                TextButton(
-                                  style: TextButton.styleFrom(
-                                      //
-                                      primary: Colors.pink),
-                                  child: Text('連関単語'),
-                                  onPressed: () {},
-                                ),
-                              ],
-                            )),
-                          ),
-                          Expanded(
-                            flex: 2,
-                            child: Container(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Container(
-                                    child: Text(
-                                      widget.kangis![index].japan,
-                                      style: TextStyle(
-                                          color: Colors.white, fontSize: 100),
-                                    ),
-                                  ),
-                                  Container(
-                                    height: 100,
-                                    child: Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.end,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceAround,
-                                      children: [
-                                        TextButton(
-                                            style: TextButton.styleFrom(
-                                              primary: Colors.pink,
-                                            ),
-                                            onPressed: () {
-                                              setState(() {
-                                                isClick[0] = !isClick[0];
-                                              });
-                                            },
-                                            child: !isClick[0]
-                                                ? Text('운독')
-                                                : Text(widget
-                                                    .kangis![index].undoc)),
-                                        TextButton(
-                                            style: TextButton.styleFrom(
-                                                primary: Colors.pink),
-                                            onPressed: () {
-                                              setState(() {
-                                                isClick[1] = !isClick[1];
-                                              });
-                                            },
-                                            child: !isClick[1]
-                                                ? Text('훈독')
-                                                : Text(widget
-                                                    .kangis![index].hundoc)),
-                                        TextButton(
-                                            style: TextButton.styleFrom(
-                                                primary: Colors.pink),
-                                            onPressed: () {
-                                              setState(() {
-                                                isClick[2] = !isClick[2];
-                                              });
-                                            },
-                                            child: !isClick[2]
-                                                ? Text('한자')
-                                                : Text(widget
-                                                    .kangis![index].korea)),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                              flex: 1,
-                              child: Container(
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    TextButton(
-                                        style: TextButton.styleFrom(
-                                            primary: Colors.pink),
-                                        onPressed: () {
-                                          if (index + 1 ==
-                                              widget.kangis!.length) {
-                                            if (restKangis.isNotEmpty) {
-                                              shoWMessage();
-                                            } else {
-                                              return Navigator.of(context)
-                                                  .pop(context);
-                                            }
-                                          }
-                                          switchingVoca();
-                                          setState(() {
-                                            index++;
-                                          });
-                                        },
-                                        child: Text('知っています。')),
-                                    TextButton(
-                                        style: TextButton.styleFrom(
-                                            primary: Colors.pink),
-                                        onPressed: () {
-                                          restKangis.add(widget.kangis![index]);
-                                          index++;
-                                          if (index == widget.kangis!.length) {
-                                            if (restKangis.isNotEmpty) {
-                                              shoWMessage();
-                                            } else {
-                                              return Navigator.of(context)
-                                                  .pop(context);
-                                            }
-                                          } else {
-                                            switchingVoca();
-                                            setState(() {});
-                                          }
-                                        },
-                                        child: Text('知っていません。')),
-                                  ],
-                                ),
-                              )),
-                        ]),
-                  )),
-                )),
-          );
-  }
-}
+         
+ */
