@@ -5,12 +5,13 @@ class Kangi {
   final String korea;
   final String undoc;
   final String hundoc;
-
+  final String id;
   const Kangi({
     required this.japan,
     required this.korea,
     required this.undoc,
     required this.hundoc,
+    required this.id,
   });
 
   factory Kangi.fromJson(Map<String, dynamic> json) {
@@ -18,6 +19,7 @@ class Kangi {
         japan: json['kangi'],
         korea: json['mean'],
         undoc: json['undoc'],
-        hundoc: json['hundoc']);
+        hundoc: json['hundoc'],
+        id: json['id']);
   }
 }

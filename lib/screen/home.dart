@@ -1,48 +1,66 @@
 import 'package:flutter/material.dart';
 import 'package:japan_front/screen/japanLevelPage.dart';
 import 'package:japan_front/screen/japanPage.dart';
+import 'package:japan_front/screen/kangiPage.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage>
+    with SingleTickerProviderStateMixin {
+  TabController? _tabController;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    _tabController = TabController(length: 2, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    _tabController!.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text("Welcome"),
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        // leading: BackButton(color: Colors.white),
+        actions: [IconButton(onPressed: () {}, icon: Icon(Icons.settings))],
+        title: Text(
+          'Japan Voca',
         ),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                height: 50,
-                width: 200,
-                child: RaisedButton(
-                  onPressed: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (content) {
-                      return JapanPage();
-                    }));
-                  },
-                  child: Text(
-                    "日本語",
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              Container(
-                height: 50,
-                width: 200,
-                child: RaisedButton(
-                  onPressed: () {},
-                  child: Text("韓国語"),
-                ),
-              )
-            ],
+      ),
+      body: TabBarView(
+        children: [
+          JapanPage(),
+          KangiPage(),
+        ],
+        controller: _tabController,
+      ),
+      backgroundColor: Colors.black,
+      bottomNavigationBar: TabBar(
+        tabs: [
+          Tab(
+            child: Text('Kangi'),
           ),
-        ));
+          Tab(
+            child: Text('Kangi'),
+          ),
+        ],
+        controller: _tabController,
+        labelColor: Colors.white,
+        indicatorColor: Colors.white,
+      ),
+    );
   }
 }

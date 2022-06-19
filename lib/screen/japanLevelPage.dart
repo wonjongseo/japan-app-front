@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:japan_front/screen/kangi_list.dart';
+import 'package:japan_front/screen/jlpt.dart';
 
 class JapanLevelPage extends StatelessWidget {
   const JapanLevelPage({Key? key}) : super(key: key);
