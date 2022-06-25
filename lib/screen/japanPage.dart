@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class JapanPage extends StatelessWidget {
   const JapanPage({Key? key}) : super(key: key);
 
-  ElevatedButton createButton(String level, BuildContext context) {
+  ElevatedButton drawSreen(String level, BuildContext context) {
     return ElevatedButton(
       onPressed: () {
         Navigator.pushNamed(context, "/kangis/level/N$level");
@@ -24,23 +24,23 @@ class JapanPage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            createButton("1", context),
+            drawSreen("1", context),
             SizedBox(
               height: 35,
             ),
-            createButton("2", context),
+            drawSreen("2", context),
             SizedBox(
               height: 35,
             ),
-            createButton("3", context),
+            drawSreen("3", context),
             SizedBox(
               height: 35,
             ),
-            createButton("4", context),
+            drawSreen("4", context),
             SizedBox(
               height: 35,
             ),
-            createButton("5", context),
+            drawSreen("5", context),
           ],
         ),
       ),

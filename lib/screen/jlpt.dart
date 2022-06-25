@@ -1,18 +1,21 @@
-import 'dart:convert';
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
-import 'package:japan_front/model/Japan.dart';
+
 import 'package:japan_front/model/Kaigi.dart';
 import 'package:japan_front/network.dart';
 import 'package:http/http.dart' as http;
-import 'package:japan_front/screen/japanPage.dart';
+import 'package:japan_front/screen/relatedJapan.dart';
+
+import 'package:path/path.dart' as path;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:sqflite/sqlite_api.dart';
 
 class JLPT extends StatefulWidget {
   final int level;
+  final int step;
   List<Kangi>? kangis;
-  JLPT({Key? key, required this.level, this.kangis}) : super(key: key);
+  JLPT({Key? key, required this.level, this.kangis, required this.step})
+      : super(key: key);
 
   @override
   State<JLPT> createState() => _JLPTState();
@@ -28,6 +31,19 @@ class _JLPTState extends State<JLPT> {
   void initState() {
     super.initState();
     getJLPT();
+
+    aaa();
+  }
+
+  void aaa() async {
+    Database database = await initDatabase();
+
+    List<Map<String, dynamic>> list = await database
+            .rawQuery("SELECT korea, japan, undoc,hundoc,id h FROM kangi")
+        as List<Map<String, dynamic>>;
+    for (int i = 0; i < list.length; i++) {
+      print(list[i]['japan'].toString());
+    }
   }
 
   void switchingVoca() {
@@ -36,66 +52,22 @@ class _JLPTState extends State<JLPT> {
 
   void getJLPT() {
     if (widget.kangis == null) {
-      _getShardData();
+      _getPrevIndex();
       futureKangis = new Network("http://localhost:4000/kangis/level")
-          .fetchData(http.Client(), widget.level);
+          .fetchKangiLevelByStep(http.Client(), widget.level, widget.step);
     }
   }
 
-  void shoWMessage() {
-    showDialog(
-        barrierDismissible: false,
-        context: context,
-        builder: (BuildContext ctx) {
-          return AlertDialog(
-            title: Text(
-              "知らない単語が${restKangis.length}個残っています。",
-              style: TextStyle(fontSize: 18),
-            ),
-            content: const Text(
-              '単語を混ざろうとはOKボタンを押してください。',
-              style: TextStyle(fontSize: 11),
-            ),
-            actions: <Widget>[
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: [
-                    TextButton(
-                      onPressed: () {
-                        Navigator.of(ctx).popUntil(ModalRoute.withName('/'));
-                      },
-                      child: const Text(
-                        '出てきます',
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        restKangis.shuffle();
-                        Navigator.pop(ctx);
-                        Navigator.pushReplacement(context,
-                            MaterialPageRoute(builder: (_) {
-                          return JLPT(
-                            level: widget.level,
-                            kangis: restKangis,
-                          );
-                        }));
-                      },
-                      child: const Text('混ざります。'),
-                    ),
-                    // TextButton(
-                    //   onPressed: () => Navigator.pop(context2, 'OK'),
-                    //   child: const Text('もっと見せます'),
-                    // ),
-                  ],
-                ),
-              )
-            ],
-          );
-        });
+  Future<Database> initDatabase() async {
+    return openDatabase(path.join(await getDatabasesPath(), 'rest_kangi.db'),
+        onCreate: (db, version) {
+      return db.execute(
+        "CREATE TABLE kangi(japan TEXT,korea TEXT,undoc TEXT,hundoc TEXT, id TEXT)",
+      );
+    }, version: 1);
   }
 
-  void _setShardData(int index) async {
+  void _setPrevIndex(int index) async {
     var key = 'last_index';
     SharedPreferences pref = await SharedPreferences.getInstance();
     /*
@@ -105,7 +77,7 @@ class _JLPTState extends State<JLPT> {
     pref.setInt(key, index);
   }
 
-  void _getShardData() async {
+  void _getPrevIndex() async {
     var key = 'last_index';
     SharedPreferences pref = await SharedPreferences.getInstance();
 
@@ -147,19 +119,19 @@ class _JLPTState extends State<JLPT> {
                   child: Text(snapshot.error.toString()),
                 );
               } else if (snapshot.hasData) {
-                return _getSafeArea(snapshot.data!);
+                return drawScreen(snapshot.data!);
               }
               return Center(child: CircularProgressIndicator());
             })
-        : _getSafeArea(widget.kangis!);
+        : drawScreen(widget.kangis!);
   }
 
-  SafeArea _getSafeArea(List<Kangi> kangis) {
+  SafeArea drawScreen(List<Kangi> kangis) {
     return SafeArea(
       child: Scaffold(
           appBar: AppBar(
             title: Text(
-              'N${widget.level}',
+              'N${widget.level}  level ${widget.step}',
             ),
             backgroundColor: Colors.black,
             leading: IconButton(
@@ -167,8 +139,20 @@ class _JLPTState extends State<JLPT> {
                 Icons.arrow_back_ios,
                 color: Colors.white,
               ),
-              onPressed: () {
-                _setShardData(index);
+              onPressed: () async {
+                _setPrevIndex(index);
+                if (restKangis.isEmpty) {
+                  Database database = await initDatabase();
+                  for (Kangi kangi in kangis) {
+                    database.insert('kangi', kangi.toMap());
+                  }
+                } else {
+                  Database database = await initDatabase();
+                  for (Kangi kangi in kangis) {
+                    database
+                        .rawQuery("DELETE FROM kangi WHERE id = ${kangi.id}");
+                  }
+                }
                 Navigator.pop(context);
               },
             ),
@@ -192,7 +176,13 @@ class _JLPTState extends State<JLPT> {
                                 //
                                 primary: Colors.pink),
                             child: Text('連関単語'),
-                            onPressed: () {},
+                            onPressed: () {
+                              Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (BuildContext content) =>
+                                          RelatedJapan(id: kangis[index].id)));
+                            },
                           ),
                         ],
                       )),
@@ -310,178 +300,61 @@ class _JLPTState extends State<JLPT> {
           )),
     );
   }
-}
 
-
-/*
-        return SafeArea(
-                  child: Scaffold(
-                      appBar: AppBar(
-                        title: Text(
-                          'N${widget.level}',
-                        ),
-                        backgroundColor: Colors.black,
-                        leading: IconButton(
-                          icon: Icon(
-                            Icons.arrow_back_ios,
-                            color: Colors.white,
-                          ),
-                          onPressed: () {
-                            _setShardData(index);
-                            Navigator.pop(context);
-                          },
-                        ),
+  void shoWMessage() {
+    showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (BuildContext ctx) {
+          return AlertDialog(
+            title: Text(
+              "知らない単語が${restKangis.length}個残っています。",
+              style: TextStyle(fontSize: 18),
+            ),
+            content: const Text(
+              '単語を混ざろうとはOKボタンを押してください。',
+              style: TextStyle(fontSize: 11),
+            ),
+            actions: <Widget>[
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    TextButton(
+                      onPressed: () {
+                        // Navigator.of(ctx).popUntil(ModalRoute.withName(
+                        //     '/kangis/level/N${widget.level}'));
+                        Navigator.of(ctx).popUntil(ModalRoute.withName(
+                            '/kangis/level/N${widget.level}'));
+                      },
+                      child: const Text(
+                        '出てきます',
                       ),
-                      body: Padding(
-                        padding: EdgeInsets.only(
-                            top: 10, bottom: 10, left: 20, right: 20),
-                        child: Container(
-                            child: Center(
-                          child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Expanded(
-                                  flex: 1,
-                                  child: Container(
-                                      //height: MediaQuery.of(context).size.height / 3.3333,
-                                      child: Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      TextButton(
-                                        style: TextButton.styleFrom(
-                                            //
-                                            primary: Colors.pink),
-                                        child: Text('連関単語'),
-                                        onPressed: () {},
-                                      ),
-                                    ],
-                                  )),
-                                ),
-                                Expanded(
-                                  flex: 2,
-                                  child: Container(
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Container(
-                                          child: Text(
-                                            snapshot.data![index].japan,
-                                            style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 100),
-                                          ),
-                                        ),
-                                        Container(
-                                          height: 100,
-                                          child: Row(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.end,
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceAround,
-                                            children: [
-                                              TextButton(
-                                                  style: TextButton.styleFrom(
-                                                    primary: Colors.pink,
-                                                  ),
-                                                  onPressed: () {
-                                                    setState(() {
-                                                      isClick[0] = !isClick[0];
-                                                    });
-                                                  },
-                                                  child: !isClick[0]
-                                                      ? Text('운독')
-                                                      : Text(snapshot
-                                                          .data![index].undoc)),
-                                              TextButton(
-                                                  style: TextButton.styleFrom(
-                                                      primary: Colors.pink),
-                                                  onPressed: () {
-                                                    setState(() {
-                                                      isClick[1] = !isClick[1];
-                                                    });
-                                                  },
-                                                  child: !isClick[1]
-                                                      ? Text('훈독')
-                                                      : Text(snapshot
-                                                          .data![index]
-                                                          .hundoc)),
-                                              TextButton(
-                                                  style: TextButton.styleFrom(
-                                                      primary: Colors.pink),
-                                                  onPressed: () {
-                                                    setState(() {
-                                                      isClick[2] = !isClick[2];
-                                                    });
-                                                  },
-                                                  child: !isClick[2]
-                                                      ? Text('한자')
-                                                      : Text(snapshot
-                                                          .data![index].korea)),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                Expanded(
-                                    flex: 1,
-                                    child: Container(
-                                      child: Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          TextButton(
-                                              style: TextButton.styleFrom(
-                                                  primary: Colors.pink),
-                                              onPressed: () {
-                                                index++;
-                                                if (index ==
-                                                    snapshot.data!.length) {
-                                                  if (restKangis.isNotEmpty) {
-                                                    shoWMessage();
-                                                  } else {
-                                                    return Navigator.of(context)
-                                                        .pop(context);
-                                                  }
-                                                } else {
-                                                  switchingVoca();
-                                                  setState(() {});
-                                                }
-                                              },
-                                              child: Text('知っています。')),
-                                          TextButton(
-                                              style: TextButton.styleFrom(
-                                                  primary: Colors.pink),
-                                              onPressed: () {
-                                                restKangis
-                                                    .add(snapshot.data![index]);
-                                                index++;
-                                                if (index ==
-                                                    snapshot.data!.length) {
-                                                  if (restKangis.isNotEmpty) {
-                                                    shoWMessage();
-                                                  } else {
-                                                    return Navigator.of(context)
-                                                        .pop(context);
-                                                  }
-                                                } else {
-                                                  switchingVoca();
-                                                  setState(() {});
-                                                }
-                                              },
-                                              child: Text('知っていません。')),
-                                        ],
-                                      ),
-                                    )),
-                              ]),
-                        )),
-                      )),
-                );
-         
- */
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        restKangis.shuffle();
+                        Navigator.pop(ctx);
+                        Navigator.pushReplacement(context,
+                            MaterialPageRoute(builder: (_) {
+                          return JLPT(
+                            level: widget.level,
+                            step: widget.step,
+                            kangis: restKangis,
+                          );
+                        }));
+                      },
+                      child: const Text('混ざります。'),
+                    ),
+                    // TextButton(
+                    //   onPressed: () => Navigator.pop(context2, 'OK'),
+                    //   child: const Text('もっと見せます'),
+                    // ),
+                  ],
+                ),
+              )
+            ],
+          );
+        });
+  }
+}

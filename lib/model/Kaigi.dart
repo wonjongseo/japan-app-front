@@ -22,4 +22,13 @@ class Kangi {
         hundoc: json['hundoc'],
         id: json['id']);
   }
+  Map<String, dynamic> toMap() {
+    return {
+      'japan': japan,
+      'korea': korea,
+      'undoc': undoc,
+      'hundoc': hundoc,
+      'id': id
+    };
+  }
 }

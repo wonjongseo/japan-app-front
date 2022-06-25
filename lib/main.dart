@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:japan_front/screen/KangiJlptLevel.dart';
 import 'package:japan_front/screen/home.dart';
-import 'package:japan_front/screen/jlpt.dart';
+import 'package:japan_front/screen/JLPT.dart';
 
 void main() => runApp(MyApp());
 
@@ -17,11 +18,12 @@ class MyApp extends StatelessWidget {
       initialRoute: "/",
       routes: {
         "/": (context) => HomePage(),
-        "/kangis/level/N1": (context) => JLPT(level: 1),
-        "/kangis/level/N2": (context) => JLPT(level: 2),
-        "/kangis/level/N3": (context) => JLPT(level: 3),
-        "/kangis/level/N4": (context) => JLPT(level: 4),
-        "/kangis/level/N5": (context) => JLPT(level: 5),
+        "/kangis/level/N1": (context) => KangiJlptLevel(level: 1),
+        // "/kangis/level/N1/step": (context) => KangiLevel(level: 1),
+        "/kangis/level/N2": (context) => KangiJlptLevel(level: 2),
+        "/kangis/level/N3": (context) => KangiJlptLevel(level: 3),
+        "/kangis/level/N4": (context) => KangiJlptLevel(level: 4),
+        "/kangis/level/N5": (context) => KangiJlptLevel(level: 5),
         // "/kangi": null,
       },
     );

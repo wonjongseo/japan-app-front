@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:japan_front/model/Kaigi.dart';
 import 'package:japan_front/network.dart';
 import 'package:http/http.dart' as http;
-import 'package:japan_front/screen/question.dart';
+import 'package:japan_front/screen/relatedJapan.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class JLPT extends StatefulWidget {
@@ -18,6 +18,7 @@ class JLPT extends StatefulWidget {
 class _JLPTState extends State<JLPT> {
   late Future<List<Kangi>> futureKangis;
   late List<Kangi> temp = [];
+
   late List<Kangi> restKangis = [];
   List isButtonCheck = List<bool>.filled(3, true);
   Set seenJLPT = {};
@@ -38,7 +39,7 @@ class _JLPTState extends State<JLPT> {
 
   void getJLPT() {
     futureKangis = new Network("http://localhost:4000/kangis/level")
-        .fetchData(http.Client(), widget.level);
+        .fetchKangiLevelByStep(http.Client(), widget.level, 1);
   }
 
   Scaffold getScaffold() {
@@ -55,7 +56,7 @@ class _JLPTState extends State<JLPT> {
               child: Text("連間単語"),
               onPressed: () {
                 Navigator.push(context, MaterialPageRoute(builder: (context) {
-                  return Question(id: temp[index].id);
+                  return RelatedJapan(id: temp[index].id);
                 }));
               },
             ),

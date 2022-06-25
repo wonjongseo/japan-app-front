@@ -9,8 +9,10 @@ class Network {
   String url;
   Network(this.url);
 
-  Future<List<Kangi>> fetchData(http.Client client, int page) async {
-    String newUrl = this.url + "?n=" + page.toString();
+  Future<List<Kangi>> fetchKangiLevelByStep(
+      http.Client client, int page, int? step) async {
+    String newUrl =
+        this.url + "?n=" + page.toString() + "&step=" + step.toString();
 
     var url = Uri.parse(newUrl);
     var response = await client.get(url);
