@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:japan_front/screen/KangiJlptLevel.dart';
-import 'package:japan_front/screen/japanPage.dart';
+import 'package:japan_front/screen/kangi/KangiHomePage.dart';
 import 'package:japan_front/screen/kangiPage.dart';
 
 class HomePage extends StatefulWidget {
@@ -42,7 +41,8 @@ class _HomePageState extends State<HomePage>
       ),
       body: TabBarView(
         children: [
-          JapanPage(),
+          KangiHomePage(),
+          // must Change name
           KangiPage(),
         ],
         controller: _tabController,

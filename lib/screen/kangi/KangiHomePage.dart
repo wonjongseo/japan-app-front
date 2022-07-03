@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:sqflite/sqlite_api.dart';
 
-class JapanPage extends StatelessWidget {
-  const JapanPage({Key? key}) : super(key: key);
+class KangiHomePage extends StatelessWidget {
+  const KangiHomePage({Key? key}) : super(key: key);
 
   ElevatedButton drawSreen(String level, BuildContext context) {
     return ElevatedButton(

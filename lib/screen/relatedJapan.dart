@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:japan_front/api/api.dart';
+import 'package:japan_front/api/japanNetwork.dart';
 import 'package:japan_front/model/Japan.dart';
-import 'package:japan_front/network.dart';
+import 'package:japan_front/api/network.dart';
 import 'package:http/http.dart' as http;
 
 class RelatedJapan extends StatefulWidget {
@@ -14,6 +16,20 @@ class RelatedJapan extends StatefulWidget {
 class _RelatedJapanState extends State<RelatedJapan> {
   late Future<List<Japan>> futureJapans;
 
+  Widget isLongerThen13Word(String word) {
+    return word.length >= 13
+        ? TextButton(
+            onPressed: () {
+              print(word);
+              shoWMessage(word);
+            },
+            child: Text(word.substring(0, 13) + "..."))
+        : Text(
+            word,
+            style: TextStyle(color: Colors.pink),
+          );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -24,11 +40,46 @@ class _RelatedJapanState extends State<RelatedJapan> {
   late List<bool> isClickedYomikata;
 
   void getJapan() {
-    Network network = Network("http://localhost:4000/japans");
-    futureJapans = network.fetchJapans(http.Client(), widget.id);
+    futureJapans = JapanNetwork(Api.getJapansByKangiId)
+        .getJapansByKangiId(http.Client(), widget.id);
+
     futureJapans.then((value) => {
           isClickedYomikata = List<bool>.filled(value.length, false),
           isClickedMean = List<bool>.filled(value.length, false),
+        });
+  }
+
+  void shoWMessage(String word) {
+    showDialog(
+        context: context,
+        builder: (BuildContext ctx) {
+          return AlertDialog(
+            title: Text(
+              '意味',
+              style: TextStyle(fontSize: 18),
+            ),
+            content: Text(
+              word,
+              style: TextStyle(fontSize: 13),
+            ),
+            actions: <Widget>[
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: const Text(
+                        'OK',
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            ],
+          );
         });
   }
 
@@ -47,8 +98,6 @@ class _RelatedJapanState extends State<RelatedJapan> {
               child: Text(snapshot.error.toString()),
             );
           } else if (snapshot.hasData) {
-            print("herer ??");
-
             return Padding(
               padding: const EdgeInsets.only(
                   top: 20, right: 30, left: 30, bottom: 20),
@@ -64,7 +113,7 @@ class _RelatedJapanState extends State<RelatedJapan> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Container(
-                              width: 80,
+                              width: 70,
                               child: Text(
                                 snapshot.data![index].japan,
                                 style:
@@ -72,29 +121,39 @@ class _RelatedJapanState extends State<RelatedJapan> {
                               ),
                             ),
                             Container(
-                                width: 150,
+                                width: 160,
                                 child: Center(
-                                  child: !isClickedMean[index]
-                                      ? TextButton(
-                                          style: TextButton.styleFrom(
-                                              backgroundColor: Colors.pink),
-                                          onPressed: () {
-                                            setState(() {
-                                              isClickedMean[index] =
-                                                  !isClickedMean[index];
-                                            });
-                                          },
-                                          child: Text("Mean",
-                                              style: TextStyle(
-                                                  color: Colors.black)),
-                                        )
-                                      : Text(
-                                          snapshot.data![index].korea,
-                                          style: TextStyle(color: Colors.pink),
-                                        ),
-                                )),
+                                    child: !isClickedMean[index]
+                                        ? TextButton(
+                                            style: TextButton.styleFrom(
+                                                backgroundColor: Colors.pink),
+                                            onPressed: () {
+                                              setState(() {
+                                                isClickedMean[index] =
+                                                    !isClickedMean[index];
+                                              });
+                                            },
+                                            child: Text("意味",
+                                                style: TextStyle(
+                                                    color: Colors.black)),
+                                          )
+                                        : isLongerThen13Word(
+                                            snapshot.data![index].korea)
+
+                                    /*
+                                         child: !isClick[0]
+                                          ? Text('운독') : isLongerThen13Word(kangis[index].undoc) ? TextButton(
+                                                  onPressed: () {
+                                                    print(kangis[index].undoc);
+                                                  },
+                                                  child: Text(kangis[index]
+                                                      .undoc
+                                                      .substring(0, 15)))
+                                              : Text(kangis[index].undoc))
+                                         */
+                                    )),
                             Container(
-                                width: 80,
+                                width: 100,
                                 child: Center(
                                   child: !isClickedYomikata[index]
                                       ? TextButton(
@@ -108,15 +167,16 @@ class _RelatedJapanState extends State<RelatedJapan> {
                                             });
                                           },
                                           child: Text(
-                                            "Mean",
+                                            "読み方",
                                             style: TextStyle(
-                                              color: Colors.black,
-                                            ),
+                                                color: Colors.black,
+                                                fontSize: 11),
                                           ))
                                       : Text(
                                           snapshot.data![index].yomikata,
                                           style: TextStyle(
-                                              color: Colors.pink, fontSize: 20),
+                                            color: Colors.pink,
+                                          ),
                                         ),
                                 ))
                           ],

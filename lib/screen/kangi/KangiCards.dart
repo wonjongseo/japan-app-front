@@ -1,49 +1,79 @@
 import 'package:flutter/material.dart';
+import 'package:japan_front/api/api.dart';
+import 'package:japan_front/api/kangiNetwork.dart';
+import 'package:japan_front/model/Japan.dart';
 
 import 'package:japan_front/model/Kaigi.dart';
-import 'package:japan_front/network.dart';
+import 'package:japan_front/api/network.dart';
 import 'package:http/http.dart' as http;
 import 'package:japan_front/screen/relatedJapan.dart';
 
 import 'package:path/path.dart' as path;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:sqflite/sqflite.dart';
 import 'package:sqflite/sqlite_api.dart';
 
-class JLPT extends StatefulWidget {
+class KangiCards extends StatefulWidget {
   final int level;
   final int step;
+
+  final Future<Database> database;
+
   List<Kangi>? kangis;
-  JLPT({Key? key, required this.level, this.kangis, required this.step})
-      : super(key: key);
+  KangiCards({
+    Key? key,
+    required this.level,
+    required this.step,
+    required this.database,
+    this.kangis,
+  }) : super(key: key);
 
   @override
-  State<JLPT> createState() => _JLPTState();
+  State<KangiCards> createState() => _KangiCardsState();
 }
 
-class _JLPTState extends State<JLPT> {
+class _KangiCardsState extends State<KangiCards> {
   late Future<List<Kangi>> futureKangis;
   List<Kangi> restKangis = List.empty(growable: true);
-
   List<bool> isClick = List.filled(3, false);
+
   int index = 0;
+
   @override
   void initState() {
     super.initState();
-    getJLPT();
+    // _getPrevIndex();
 
-    aaa();
+    getJLPT();
   }
 
-  void aaa() async {
-    Database database = await initDatabase();
+  void _deleteKangis() async {
+    final Database database = await widget.database;
 
-    List<Map<String, dynamic>> list = await database
-            .rawQuery("SELECT korea, japan, undoc,hundoc,id h FROM kangi")
-        as List<Map<String, dynamic>>;
-    for (int i = 0; i < list.length; i++) {
-      print(list[i]['japan'].toString());
-    }
+    List<Kangi> temp = await hasPrevData();
+
+    print('before lenght : ${temp.length}');
+    await database.rawDelete(
+        "delete from japan where jlpt=${widget.level} and step=${widget.step}");
+    temp = await hasPrevData();
+    print('after lenght : ${temp.length}');
+  }
+
+  Future<List<Kangi>> hasPrevData() async {
+    final Database database = await widget.database;
+
+    List<Map<String, dynamic>> result =
+        await database.rawQuery('select * from japan');
+
+    List<Kangi> list_result = await List.generate(result.length, (index) {
+      return Kangi(
+          id: result[index]['id'],
+          korea: result[index]['korea'],
+          japan: result[index]['japan'],
+          undoc: result[index]['undoc'],
+          hundoc: result[index]['hundoc']);
+    });
+
+    return list_result;
   }
 
   void switchingVoca() {
@@ -52,60 +82,13 @@ class _JLPTState extends State<JLPT> {
 
   void getJLPT() {
     if (widget.kangis == null) {
-      _getPrevIndex();
-      futureKangis = new Network("http://localhost:4000/kangis/level")
-          .fetchKangiLevelByStep(http.Client(), widget.level, widget.step);
+      futureKangis = new KangiNetwork(Api.getKangisByJlptLevel)
+          .getKangisByLevel(http.Client(), widget.level, widget.step);
     }
   }
 
-  Future<Database> initDatabase() async {
-    return openDatabase(path.join(await getDatabasesPath(), 'rest_kangi.db'),
-        onCreate: (db, version) {
-      return db.execute(
-        "CREATE TABLE kangi(japan TEXT,korea TEXT,undoc TEXT,hundoc TEXT, id TEXT)",
-      );
-    }, version: 1);
-  }
-
-  void _setPrevIndex(int index) async {
-    var key = 'last_index';
+  void _setPrevIndex() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
-    /*
-     * TODO
-     * rest Data saving
-     */
-    pref.setInt(key, index);
-  }
-
-  void _getPrevIndex() async {
-    var key = 'last_index';
-    SharedPreferences pref = await SharedPreferences.getInstance();
-
-    var last_index = pref.getInt(key);
-
-    if (last_index != 0) {
-      AlertDialog dialog = AlertDialog(
-        title: Text('進行したデータがあります。'),
-        content: Text('続けませんか?'),
-        actions: [
-          ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context);
-                setState(() {
-                  index = last_index!;
-                });
-              },
-              child: Text('はい')),
-          ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context);
-                return;
-              },
-              child: Text('いいえ')),
-        ],
-      );
-      showDialog(context: context, builder: (context) => dialog);
-    }
   }
 
   @override
@@ -126,6 +109,18 @@ class _JLPTState extends State<JLPT> {
         : drawScreen(widget.kangis!);
   }
 
+  bool isLongerThen15Word(String word) {
+    if (word.length >= 15) return true;
+    return false;
+  }
+
+  void _insertKangi() async {
+    final Database database = await widget.database;
+    for (int i = 0; i < restKangis.length; i++) {
+      await database.insert('japan', restKangis[i].toMap());
+    }
+  }
+
   SafeArea drawScreen(List<Kangi> kangis) {
     return SafeArea(
       child: Scaffold(
@@ -140,19 +135,11 @@ class _JLPTState extends State<JLPT> {
                 color: Colors.white,
               ),
               onPressed: () async {
-                _setPrevIndex(index);
-                if (restKangis.isEmpty) {
-                  Database database = await initDatabase();
-                  for (Kangi kangi in kangis) {
-                    database.insert('kangi', kangi.toMap());
-                  }
-                } else {
-                  Database database = await initDatabase();
-                  for (Kangi kangi in kangis) {
-                    database
-                        .rawQuery("DELETE FROM kangi WHERE id = ${kangi.id}");
-                  }
+                if (restKangis.length >= 1) {
+                  // _setPrevIndex();
+                  // _insertKangi();
                 }
+
                 Navigator.pop(context);
               },
             ),
@@ -169,15 +156,24 @@ class _JLPTState extends State<JLPT> {
                       child: Container(
                           child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.end,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8.0),
+                            child: Text(
+                              '${index + 1} / ${kangis.length}',
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 15),
+                            ),
+                          ),
                           TextButton(
                             style: TextButton.styleFrom(
-                                //
-                                primary: Colors.pink),
+                              //
+                              primary: Colors.pink,
+                            ),
                             child: Text('連関単語'),
                             onPressed: () {
-                              Navigator.pushReplacement(
+                              Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                       builder: (BuildContext content) =>
@@ -194,6 +190,7 @@ class _JLPTState extends State<JLPT> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Container(
+                              height: 200,
                               child: Text(
                                 kangis[index].japan,
                                 style: TextStyle(
@@ -218,7 +215,16 @@ class _JLPTState extends State<JLPT> {
                                       },
                                       child: !isClick[0]
                                           ? Text('운독')
-                                          : Text(kangis[index].undoc)),
+                                          : isLongerThen15Word(
+                                                  kangis[index].undoc)
+                                              ? TextButton(
+                                                  onPressed: () {
+                                                    print(kangis[index].undoc);
+                                                  },
+                                                  child: Text(kangis[index]
+                                                      .undoc
+                                                      .substring(0, 15)))
+                                              : Text(kangis[index].undoc)),
                                   TextButton(
                                       style: TextButton.styleFrom(
                                           primary: Colors.pink),
@@ -275,9 +281,12 @@ class _JLPTState extends State<JLPT> {
                                   child: Text('知っています。')),
                               TextButton(
                                   style: TextButton.styleFrom(
-                                      primary: Colors.pink),
+                                    primary: Colors.pink,
+                                  ),
                                   onPressed: () {
-                                    restKangis.add(kangis[index]);
+                                    restKangis.add(
+                                      kangis[index],
+                                    );
                                     index++;
                                     if (index == kangis.length) {
                                       if (restKangis.isNotEmpty) {
@@ -322,8 +331,6 @@ class _JLPTState extends State<JLPT> {
                   children: [
                     TextButton(
                       onPressed: () {
-                        // Navigator.of(ctx).popUntil(ModalRoute.withName(
-                        //     '/kangis/level/N${widget.level}'));
                         Navigator.of(ctx).popUntil(ModalRoute.withName(
                             '/kangis/level/N${widget.level}'));
                       },
@@ -337,19 +344,16 @@ class _JLPTState extends State<JLPT> {
                         Navigator.pop(ctx);
                         Navigator.pushReplacement(context,
                             MaterialPageRoute(builder: (_) {
-                          return JLPT(
+                          return KangiCards(
                             level: widget.level,
                             step: widget.step,
                             kangis: restKangis,
+                            database: widget.database,
                           );
                         }));
                       },
                       child: const Text('混ざります。'),
                     ),
-                    // TextButton(
-                    //   onPressed: () => Navigator.pop(context2, 'OK'),
-                    //   child: const Text('もっと見せます'),
-                    // ),
                   ],
                 ),
               )

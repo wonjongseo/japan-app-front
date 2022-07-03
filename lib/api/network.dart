@@ -9,27 +9,27 @@ class Network {
   String url;
   Network(this.url);
 
-  Future<List<Kangi>> fetchKangiLevelByStep(
-      http.Client client, int page, int? step) async {
-    String newUrl =
-        this.url + "?n=" + page.toString() + "&step=" + step.toString();
+  // Future<List<Kangi>> fetchKangiLevelByStep(
+  //     http.Client client, int page, int? step) async {
+  //   String newUrl =
+  //       this.url + "?n=" + page.toString() + "&step=" + step.toString();
 
-    var url = Uri.parse(newUrl);
-    var response = await client.get(url);
+  //   var url = Uri.parse(newUrl);
+  //   var response = await client.get(url);
 
-    if (response.statusCode == 200) {
-      return compute(parseKangis, response.body);
-    } else {
-      throw Exception("Failed to load Kangi");
-    }
-  }
+  //   if (response.statusCode == 200) {
+  //     return compute(parseKangis, response.body);
+  //   } else {
+  //     throw Exception("Failed to load Kangi");
+  //   }
+  // }
 
   List<Kangi> parseKangis(String responseBody) {
     final parsed = json.decode(responseBody).cast<Map<String, dynamic>>();
     return parsed.map<Kangi>((json) => Kangi.fromJson(json)).toList();
   }
 
-  Future<List<Japan>> fetchJapans(http.Client client, String id) async {
+  Future<List<Japan>> getJapansByKangiId(http.Client client, String id) async {
     String newUrl = this.url + "/" + id;
 
     var url = Uri.parse(newUrl);
