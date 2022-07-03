@@ -67,3 +67,8 @@
 
 <br/>
 <img src="https://velog.velcdn.com/images/wonjongseo/post/8cbdffa7-96b0-410b-893f-c8f4f99933c4/image.png" width=400/>
+
+## 추후 개발
+
+1. 한자 아닌 일본어 단어를 중심적으로 볼 수 있는 기능
+2. 이어보기 기능
