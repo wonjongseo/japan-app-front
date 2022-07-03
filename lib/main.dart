@@ -9,19 +9,19 @@ void main() => runApp(MyApp());
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
-  Future<Database> initDatabase() async {
-    return openDatabase(join(await getDatabasesPath(), 'todo_database.db'),
-        onCreate: (db, version) {
-      return db.execute(
-        "create table japan(id text ,"
-        "japan text, korea text, undoc text, hundoc text, jlpt text, step text)",
-      );
-    }, version: 1);
-  }
+  // Future<Database> initDatabase() async {
+  //   return openDatabase(join(await getDatabasesPath(), 'todo_database.db'),
+  //       onCreate: (db, version) {
+  //     return db.execute(
+  //       "create table japan(id text ,"
+  //       "japan text, korea text, undoc text, hundoc text, jlpt text, step text)",
+  //     );
+  //   }, version: 1);
+  // }
 
   @override
   Widget build(BuildContext context) {
-    Future<Database> database = initDatabase();
+    // Future<Database> database = initDatabase();
 
     return MaterialApp(
       color: Colors.black,
@@ -31,16 +31,11 @@ class MyApp extends StatelessWidget {
       initialRoute: "/",
       routes: {
         "/": (context) => HomePage(),
-        "/kangis/level/N1": (context) =>
-            KangiJlptLevel(level: 1, database: database),
-        "/kangis/level/N2": (context) =>
-            KangiJlptLevel(level: 2, database: database),
-        "/kangis/level/N3": (context) =>
-            KangiJlptLevel(level: 3, database: database),
-        "/kangis/level/N4": (context) =>
-            KangiJlptLevel(level: 4, database: database),
-        "/kangis/leㅌㅌvel/N5": (context) =>
-            KangiJlptLevel(level: 5, database: database),
+        "/kangis/level/N1": (context) => KangiJlptLevel(level: 1),
+        "/kangis/level/N2": (context) => KangiJlptLevel(level: 2),
+        "/kangis/level/N3": (context) => KangiJlptLevel(level: 3),
+        "/kangis/level/N4": (context) => KangiJlptLevel(level: 4),
+        "/kangis/leㅌㅌvel/N5": (context) => KangiJlptLevel(level: 5),
         // "/kangi": null,
       },
     );

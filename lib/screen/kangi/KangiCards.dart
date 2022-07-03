@@ -16,14 +16,11 @@ class KangiCards extends StatefulWidget {
   final int level;
   final int step;
 
-  final Future<Database> database;
-
   List<Kangi>? kangis;
   KangiCards({
     Key? key,
     required this.level,
     required this.step,
-    required this.database,
     this.kangis,
   }) : super(key: key);
 
@@ -34,6 +31,7 @@ class KangiCards extends StatefulWidget {
 class _KangiCardsState extends State<KangiCards> {
   late Future<List<Kangi>> futureKangis;
   List<Kangi> restKangis = List.empty(growable: true);
+
   List<bool> isClick = List.filled(3, false);
 
   int index = 0;
@@ -41,39 +39,8 @@ class _KangiCardsState extends State<KangiCards> {
   @override
   void initState() {
     super.initState();
-    // _getPrevIndex();
 
     getJLPT();
-  }
-
-  void _deleteKangis() async {
-    final Database database = await widget.database;
-
-    List<Kangi> temp = await hasPrevData();
-
-    print('before lenght : ${temp.length}');
-    await database.rawDelete(
-        "delete from japan where jlpt=${widget.level} and step=${widget.step}");
-    temp = await hasPrevData();
-    print('after lenght : ${temp.length}');
-  }
-
-  Future<List<Kangi>> hasPrevData() async {
-    final Database database = await widget.database;
-
-    List<Map<String, dynamic>> result =
-        await database.rawQuery('select * from japan');
-
-    List<Kangi> list_result = await List.generate(result.length, (index) {
-      return Kangi(
-          id: result[index]['id'],
-          korea: result[index]['korea'],
-          japan: result[index]['japan'],
-          undoc: result[index]['undoc'],
-          hundoc: result[index]['hundoc']);
-    });
-
-    return list_result;
   }
 
   void switchingVoca() {
@@ -112,13 +79,6 @@ class _KangiCardsState extends State<KangiCards> {
   bool isLongerThen15Word(String word) {
     if (word.length >= 15) return true;
     return false;
-  }
-
-  void _insertKangi() async {
-    final Database database = await widget.database;
-    for (int i = 0; i < restKangis.length; i++) {
-      await database.insert('japan', restKangis[i].toMap());
-    }
   }
 
   SafeArea drawScreen(List<Kangi> kangis) {
@@ -348,7 +308,6 @@ class _KangiCardsState extends State<KangiCards> {
                             level: widget.level,
                             step: widget.step,
                             kangis: restKangis,
-                            database: widget.database,
                           );
                         }));
                       },

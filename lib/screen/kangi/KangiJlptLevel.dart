@@ -4,10 +4,8 @@ import 'package:sqflite/sqlite_api.dart';
 
 class KangiJlptLevel extends StatelessWidget {
   final int level;
-  final Future<Database> database;
 
-  const KangiJlptLevel({Key? key, required this.level, required this.database})
-      : super(key: key);
+  const KangiJlptLevel({Key? key, required this.level}) : super(key: key);
 
   Container drawScreen(int step, BuildContext context) {
     return Container(
@@ -20,8 +18,8 @@ class KangiJlptLevel extends StatelessWidget {
           Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (BuildContext context) => KangiCards(
-                      level: level, step: step, database: database)));
+                  builder: (BuildContext context) =>
+                      KangiCards(level: level, step: step)));
         },
         child: Text(
           "レベル $step",
@@ -35,24 +33,6 @@ class KangiJlptLevel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          final db = await database;
-
-          List<Map<String, dynamic>> result =
-              await db.rawQuery('select * from japan');
-
-          print(result.length);
-
-          await db.rawDelete('delete from japan');
-
-          List<Map<String, dynamic>> next =
-              await db.rawQuery('select * from japan');
-
-          print(next.length);
-        },
-        child: Icon(Icons.delete),
-      ),
       appBar: AppBar(
         title: Text('N${level}'),
         backgroundColor: Colors.black,
