@@ -35,7 +35,7 @@ class MyApp extends StatelessWidget {
         "/kangis/level/N2": (context) => KangiJlptLevel(level: 2),
         "/kangis/level/N3": (context) => KangiJlptLevel(level: 3),
         "/kangis/level/N4": (context) => KangiJlptLevel(level: 4),
-        "/kangis/leㅌㅌvel/N5": (context) => KangiJlptLevel(level: 5),
+        "/kangis/level/N5": (context) => KangiJlptLevel(level: 5),
         // "/kangi": null,
       },
     );
