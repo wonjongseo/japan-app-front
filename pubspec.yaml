@@ -21,6 +21,7 @@ dependencies:
     dio: ^4.0.6
     sqflite: ^2.0.2+1
     path: ^1.8.0
+    provider: ^6.0.3
 dev_dependencies:
     flutter_test:
         sdk: flutter
