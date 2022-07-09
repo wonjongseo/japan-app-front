@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:sqflite/sqlite_api.dart';
 
-class KangiHomePage extends StatelessWidget {
-  const KangiHomePage({Key? key}) : super(key: key);
+class GrammerHome extends StatelessWidget {
+  const GrammerHome({Key? key}) : super(key: key);
 
   Widget drawSreen(String level, BuildContext context) {
     return ElevatedButton(
       onPressed: () {
-        Navigator.pushNamed(context, "/kangis/level/N$level");
+        Navigator.pushNamed(context, "/grammer/level/N$level");
       },
       style: ElevatedButton.styleFrom(
           minimumSize: Size(MediaQuery.of(context).size.width - 100, 60),

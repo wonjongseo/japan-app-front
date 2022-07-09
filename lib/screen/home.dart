@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:japan_front/screen/grammer/GrammerHome.dart';
 import 'package:japan_front/screen/kangi/KangiHomePage.dart';
 import 'package:japan_front/screen/kangiPage.dart';
 
@@ -18,7 +19,7 @@ class _HomePageState extends State<HomePage>
     // TODO: implement initState
     super.initState();
 
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
   }
 
   @override
@@ -42,7 +43,7 @@ class _HomePageState extends State<HomePage>
       body: TabBarView(
         children: [
           KangiHomePage(),
-          // must Change name
+          GrammerHome(),
           KangiPage(),
         ],
         controller: _tabController,
@@ -52,6 +53,9 @@ class _HomePageState extends State<HomePage>
         tabs: [
           Tab(
             child: Text('Japan'),
+          ),
+          Tab(
+            child: Text('Grammer'),
           ),
           Tab(
             child: Text('Kangi'),

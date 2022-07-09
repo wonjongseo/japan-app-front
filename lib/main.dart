@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:japan_front/screen/grammer/GrammerLevel.dart';
 import 'package:japan_front/screen/kangi/KangiJlptLevel.dart';
 import 'package:japan_front/screen/home.dart';
 import 'package:path/path.dart';
@@ -8,16 +9,6 @@ void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
-
-  // Future<Database> initDatabase() async {
-  //   return openDatabase(join(await getDatabasesPath(), 'todo_database.db'),
-  //       onCreate: (db, version) {
-  //     return db.execute(
-  //       "create table japan(id text ,"
-  //       "japan text, korea text, undoc text, hundoc text, jlpt text, step text)",
-  //     );
-  //   }, version: 1);
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -36,6 +27,12 @@ class MyApp extends StatelessWidget {
         "/kangis/level/N3": (context) => KangiJlptLevel(level: 3),
         "/kangis/level/N4": (context) => KangiJlptLevel(level: 4),
         "/kangis/level/N5": (context) => KangiJlptLevel(level: 5),
+
+        "/grammer/level/N1": (context) => GrammerLevel(level: 1),
+        "/grammer/level/N2": (context) => GrammerLevel(level: 2),
+        "/grammer/level/N3": (context) => GrammerLevel(level: 3),
+        "/grammer/level/N4": (context) => GrammerLevel(level: 4),
+        "/grammer/level/N5": (context) => GrammerLevel(level: 5),
         // "/kangi": null,
       },
     );
