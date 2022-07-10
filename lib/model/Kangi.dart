@@ -1,11 +1,21 @@
-import 'dart:convert';
+import 'package:hive/hive.dart';
 
+// part 'kangi.g.dart';
+part 'Kangi.g.dart';
+
+@HiveType(typeId: 0)
 class Kangi {
+  @HiveField(0)
   final String japan;
+  @HiveField(1)
   final String korea;
+  @HiveField(2)
   final String undoc;
+  @HiveField(3)
   final String hundoc;
+  @HiveField(4)
   final String id;
+
   const Kangi({
     required this.japan,
     required this.korea,

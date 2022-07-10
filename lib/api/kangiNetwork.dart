@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
-import 'package:japan_front/model/Kaigi.dart';
+import 'package:japan_front/model/Kangi.dart';
 import 'package:http/http.dart' as http;
 
 class KangiNetwork {

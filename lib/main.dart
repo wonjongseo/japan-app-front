@@ -1,10 +1,31 @@
-import 'package:flutter/material.dart';
-import 'package:japan_front/model/Custom_database.dart';
-import 'package:path/path.dart';
-import 'package:sqflite/sqflite.dart';
-import 'package:sqflite/sqlite_api.dart';
+import 'dart:developer';
 
-void main() => runApp(MyApp());
+import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:japan_front/JlptLevel.dart';
+import 'package:japan_front/Palette.dart';
+import 'package:japan_front/components/CAppber.dart';
+import 'package:japan_front/hive/hive_db.dart';
+import 'package:japan_front/model/Progressing.dart';
+import 'package:japan_front/provider/HomeProver.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:provider/provider.dart';
+
+void main() async {
+  // main 에서 비동기 사용
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Hive.initFlutter();
+  await HiveDB.init();
+  // runApp(MyApp());
+  runApp(MultiProvider(
+    providers: [ChangeNotifierProvider(create: (_) => HomeProvider())],
+    child: MyApp(),
+  ));
+}
 
 class MyApp extends StatelessWidget {
   // Database database
@@ -12,95 +33,75 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Future<Database> database = CustomDatabase().initDatabase();
-
     return MaterialApp(
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSwatch(primarySwatch: Palette.kToDark),
+      ),
       debugShowCheckedModeBanner: false,
       title: "Japanese App",
       initialRoute: "/",
-      routes: {"/": ((context) => MainPage(database))},
+      routes: {"/": ((context) => MainPage())},
     );
   }
 }
 
 class MainPage extends StatefulWidget {
-  final Future<Database> db;
-  MainPage(this.db);
+  MainPage();
 
   @override
   State<MainPage> createState() => _MainPageState();
 }
 
 class _MainPageState extends State<MainPage> {
-  double _value = 0.4;
-
-  // void _setvalue(double value) => setState(() => _value = value);
-
   @override
   void initState() {
-    print('???');
     // TODO: implement initState
+
     super.initState();
-  }
-
-  @override
-  void didChangeDependencies() {
-    // TODO: implement didChangeDependencies
-    super.didChangeDependencies();
-    getAA();
-  }
-
-  void getAA() async {
-    print('object');
-    List<Progressing> list = await CustomDatabase().getProgressing(widget.db);
-    print(list.length);
-    for (int i = 0; i < list.length; i++) {
-      print('i : ${i}');
-      print('range : ${list[i].range}');
-      print('level : ${list[i].level}');
-    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(40),
-        child: AppBar(
-          leading: Icon(Icons.settings),
-          centerTitle: false,
-          title: Text(
-            "일본어 단어",
-            style: TextStyle(),
-          ),
-        ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: (() {
+          HiveDB.instance.deleteProgressingAll();
+        }),
+        child: Icon(Icons.add),
       ),
+      appBar: getCustomAppBar('일본어 단어'),
       body: Container(
           child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            drawButton(context, '1'),
-            drawButton(context, '2'),
-            drawButton(context, '3'),
-            drawButton(context, '4'),
-            drawButton(context, '5')
+            CustomButton(1),
+            CustomButton(2),
+            CustomButton(3),
+            CustomButton(4),
+            CustomButton(5),
           ],
         ),
       )),
     );
   }
+}
 
-  // 버튼 위젯
-  Widget drawButton(BuildContext context, String level) {
+class CustomButton extends StatelessWidget {
+  final int level;
+
+  CustomButton(this.level);
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       height: MediaQuery.of(context).size.height / 7,
       margin: EdgeInsets.symmetric(vertical: 10),
       child: ElevatedButton(
           onPressed: () {
-            Navigator.of(context)
-                .push(MaterialPageRoute(builder: ((context) => Text("asd"))));
+            Navigator.of(context).push(MaterialPageRoute(
+                builder: ((context) => JlptLevel(level.toString()))));
           },
           child: Padding(
             padding:
@@ -118,7 +119,9 @@ class _MainPageState extends State<MainPage> {
                       width: MediaQuery.of(context).size.width - 180,
                       child: SliderTheme(
                         child: Slider(
-                          value: 50,
+                          // value: HiveDB.instance
+                          //     .getProgressiveLevel(level.toString()),
+                          value: 0,
                           max: 100,
                           min: 0,
                           activeColor: Colors.black,
@@ -147,123 +150,3 @@ class _MainPageState extends State<MainPage> {
     );
   }
 }
-
-/*
-import 'package:flutter/material.dart';
-
-void main() => runApp(MyApp());
-
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: "Japanese App",
-      initialRoute: "/",
-      routes: {"/": ((context) => MainPage())},
-    );
-  }
-}
-
-class MainPage extends StatefulWidget {
-  @override
-  State<MainPage> createState() => _MainPageState();
-}
-
-// 버튼 위젯
-Widget drawButton(BuildContext context, String level) {
-  return Container(
-    height: MediaQuery.of(context).size.height / 7,
-    margin: EdgeInsets.symmetric(vertical: 10),
-    child: ElevatedButton(
-        onPressed: () {},
-        child: Padding(
-          padding:
-              const EdgeInsets.only(top: 8.0, bottom: 8, left: 2, right: 2),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(bottom: 5),
-                child: Text('미학습'),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 5),
-                child: Text('N${level}'),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    width: MediaQuery.of(context).size.width - 180,
-                    child: SliderTheme(
-                      child: Slider(
-                        value: 50,
-                        max: 100,
-                        min: 0,
-                        activeColor: Colors.black,
-                        inactiveColor: Colors.grey,
-                        onChanged: (double value) {},
-                      ),
-                      data: SliderTheme.of(context).copyWith(
-                        // slider height
-                        trackHeight: 10,
-                        // remove padding
-                        overlayShape: SliderComponentShape.noOverlay,
-                        thumbShape:
-                            RoundSliderThumbShape(enabledThumbRadius: 0.0),
-                      ),
-                    ),
-                  ),
-                  Text(
-                    '학습률: 0 / 1000 [0%]',
-                    style: TextStyle(fontSize: 10),
-                  )
-                ],
-              )
-            ],
-          ),
-        )),
-  );
-}
-
-class _MainPageState extends State<MainPage> {
-  double _value = 0.4;
-
-  void _setvalue(double value) => setState(() => _value = value);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(40),
-        child: AppBar(
-          leading: Icon(Icons.settings),
-          centerTitle: false,
-          title: Text(
-            "일본어 단어",
-          ),
-        ),
-      ),
-      body: Container(
-          child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            drawButton(context, '1'),
-            drawButton(context, '2'),
-            drawButton(context, '3'),
-            drawButton(context, '4'),
-            drawButton(context, '5')
-          ],
-        ),
-      )),
-    );
-  }
-}
-
- 
- */

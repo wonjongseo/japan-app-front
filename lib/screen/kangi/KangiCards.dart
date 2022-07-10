@@ -3,7 +3,7 @@ import 'package:japan_front/api/api.dart';
 import 'package:japan_front/api/kangiNetwork.dart';
 import 'package:japan_front/model/Japan.dart';
 
-import 'package:japan_front/model/Kaigi.dart';
+import 'package:japan_front/model/Kangi.dart';
 import 'package:japan_front/api/network.dart';
 import 'package:http/http.dart' as http;
 import 'package:japan_front/screen/relatedJapan.dart';

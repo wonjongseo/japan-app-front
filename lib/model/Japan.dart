@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:hive/hive.dart';
+
 class Japan {
   final String japan;
   final String korea;

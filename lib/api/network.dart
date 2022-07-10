@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:japan_front/model/Japan.dart';
-import 'package:japan_front/model/Kaigi.dart';
+import 'package:japan_front/model/Kangi.dart';
 
 class Network {
   String url;
