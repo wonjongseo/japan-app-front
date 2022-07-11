@@ -5,49 +5,66 @@ import 'package:japan_front/model/Progressing.dart';
 import 'package:japan_front/model/enum/api_request_status.dart';
 
 class HomeProvider extends ChangeNotifier {
-  late List<Kangi> kangis;
-  late Map<dynamic, Progressing> progressing;
+  late Map kangis;
+  late Map progressing;
   ApiRequestStatus apiRequestStatus = ApiRequestStatus.loading;
 
   void getProgressing() async {
     setApiRequestStatus(ApiRequestStatus.loading);
     try {
-      progressing =
-          HiveDB.instance.getProgressingAll() as Map<dynamic, Progressing>;
+      progressing = HiveDB.instance.getProgressingAll();
+      kangis = HiveDB.instance.getKangiAll();
 
-      if (progressing.isEmpty) {
-        for (int j = 0; j < 5; j++) {
-          for (int i = 0; i < 10; i++) {
-            Progressing progressing =
-                Progressing(level: j, step: List.filled(10, 0), step_range: 0);
-            HiveDB.instance.addProgressing(progressing);
-          }
-        }
-      }
-      progressing.forEach(
-        (key, value) {
-          print('key : ${key} , value : ${value.level}');
-        },
-      );
       setApiRequestStatus(ApiRequestStatus.loaded);
     } on Exception catch (e) {
       print(e.toString());
     }
   }
 
+  Map getTotalCntOfLevel() {
+    Map result = {};
+
+    for (int level = 1; level <= 5; level++) {
+      result[level] = kangis.values
+          .where((kangi) => int.parse(kangi.level) == level)
+          .length;
+    }
+
+    return result;
+  }
+
+  List getKangiByLevel(int level) {
+    print('homeProvider : getKangiByLevel');
+
+    return kangis.values
+        .where((kangi) => int.parse(kangi.level) == level)
+        .toList();
+  }
+
+  void changeStepByLevel(int level, int step, int currentStep) {
+    HiveDB.instance.changeStepByLevel(level, step, currentStep);
+    getProgressAndAlert();
+  }
+
+  void completePart(int level, int step) {
+    HiveDB.instance.completePart(level, step);
+    notifyListeners();
+  }
+
+  // Processing
+
   void setApiRequestStatus(ApiRequestStatus status) {
     apiRequestStatus = status;
     notifyListeners();
   }
 
-  void getProgress() {
-    progressing =
-        HiveDB.instance.getProgressingAll() as Map<dynamic, Progressing>;
+  void getProgressAndAlert() {
+    progressing = HiveDB.instance.getProgressingAll();
     notifyListeners();
   }
 
   void addProgress(Progressing progressing) {
-    HiveDB.instance.addProgressing(progressing);
-    getProgress();
+    // HiveDB.instance.addProgressing(progressing);
+    getProgressAndAlert();
   }
 }

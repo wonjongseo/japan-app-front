@@ -8,6 +8,20 @@ class KangiNetwork {
   final String url;
   KangiNetwork(this.url);
 
+  Future<List<Kangi>> getKangisAll(http.Client client) async {
+    String newUrl = this.url;
+
+    var url = Uri.parse(newUrl);
+    print(url);
+    var response = await client.get(url);
+
+    if (response.statusCode == 200) {
+      return compute(kangiJsonToList, response.body);
+    } else {
+      throw Exception("Failed to load Kangi");
+    }
+  }
+
   Future<List<Kangi>> getKangisByLevel(
       http.Client client, int n, int? step) async {
     String newUrl =

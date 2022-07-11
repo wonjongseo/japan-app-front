@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:japan_front/Related_Japan.dart';
 import 'package:japan_front/api/api.dart';
 import 'package:japan_front/api/kangiNetwork.dart';
 import 'package:japan_front/components/CAppber.dart';
@@ -60,9 +61,9 @@ class _JlptKangiCardsState extends State<JlptKangiCards> {
 class JlptKangiCard extends StatefulWidget {
   final int level;
   final int step;
-  final List<Kangi> kangi;
+  final List<Kangi> kangis;
 
-  JlptKangiCard(this.kangi, this.level, this.step);
+  JlptKangiCard(this.kangis, this.level, this.step);
 
   @override
   State<JlptKangiCard> createState() => _JlptKangiCardState();
@@ -72,15 +73,6 @@ class _JlptKangiCardState extends State<JlptKangiCard> {
   List<bool> isButtonClick = List.filled(3, false);
   int knownVocaCnt = 0;
   int index = 0;
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    SchedulerBinding.instance.addPostFrameCallback(
-      (_) => Provider.of<HomeProvider>(context, listen: false).getProgressing(),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -95,16 +87,28 @@ class _JlptKangiCardState extends State<JlptKangiCard> {
                 Expanded(
                   flex: 1,
                   child: Padding(
-                    padding: const EdgeInsets.only(top: 15, left: 8),
+                    padding: const EdgeInsets.only(top: 15, left: 8, right: 8),
                     child: Container(
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            '${index + 1}/${widget.kangi.length}',
+                            '${index + 1}/${widget.kangis.length}',
                             style: TextStyle(
                                 fontSize: 17, fontWeight: FontWeight.w600),
+                          ),
+                          ElevatedButton(
+                            child: Text("연관 단어"),
+                            style: ButtonStyle(
+                                tapTargetSize:
+                                    MaterialTapTargetSize.shrinkWrap),
+                            onPressed: () {
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (BuildContext context) {
+                                return RelatedJapan(widget.kangis[index].id);
+                              }));
+                            },
                           )
                         ],
                       ),
@@ -121,7 +125,7 @@ class _JlptKangiCardState extends State<JlptKangiCard> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                widget.kangi[index].japan,
+                                widget.kangis[index].japan,
                                 style: kangiTextStyle,
                               ),
                             ],
@@ -148,7 +152,7 @@ class _JlptKangiCardState extends State<JlptKangiCard> {
                                       ? Text("")
                                       : Container(
                                           child:
-                                              Text(widget.kangi[index].undoc),
+                                              Text(widget.kangis[index].undoc),
                                           margin: EdgeInsets.only(left: 10),
                                         ),
                                 ],
@@ -169,7 +173,7 @@ class _JlptKangiCardState extends State<JlptKangiCard> {
                                       ? Text("")
                                       : Container(
                                           child:
-                                              Text(widget.kangi[index].hundoc),
+                                              Text(widget.kangis[index].hundoc),
                                           margin: EdgeInsets.only(left: 10),
                                         ),
                                 ],
@@ -190,7 +194,7 @@ class _JlptKangiCardState extends State<JlptKangiCard> {
                                       ? Text("")
                                       : Container(
                                           child:
-                                              Text(widget.kangi[index].korea),
+                                              Text(widget.kangis[index].korea),
                                           margin: EdgeInsets.only(left: 10),
                                         ),
                                 ],
@@ -205,10 +209,19 @@ class _JlptKangiCardState extends State<JlptKangiCard> {
                                   ElevatedButton(
                                     onPressed: () {
                                       knownVocaCnt++;
-                                      if (index + 1 == widget.kangi.length) {
+                                      if (index + 1 == widget.kangis.length) {
+                                        if (knownVocaCnt ==
+                                            widget.kangis.length) {
+                                          homeProvider.completePart(
+                                              widget.level, widget.step);
+                                        }
+                                        homeProvider.changeStepByLevel(
+                                            widget.level,
+                                            widget.step - 1,
+                                            knownVocaCnt);
                                         return Navigator.of(context).pop();
                                       }
-                                      // isButtonClick.fillRange(0, 3, false);
+                                      isButtonClick.fillRange(0, 3, false);
                                       setState(() {
                                         index++;
                                       });
@@ -217,7 +230,7 @@ class _JlptKangiCardState extends State<JlptKangiCard> {
                                   ),
                                   ElevatedButton(
                                       onPressed: () {
-                                        if (index + 1 == widget.kangi.length) {
+                                        if (index + 1 == widget.kangis.length) {
                                           return Navigator.of(context).pop();
                                         }
 

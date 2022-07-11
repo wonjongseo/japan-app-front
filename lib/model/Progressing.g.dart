@@ -16,26 +16,19 @@ class ProgressingAdapter extends TypeAdapter<Progressing> {
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return Progressing(
-      level: fields[0] as int?,
-      step: (fields[1] as List?)?.cast<dynamic>(),
-      step_range: fields[2] as int?,
-    )
-      ..is_level_complete = fields[3] as bool
-      ..is_step_complete = fields[4] as bool;
+    return Progressing()
+      ..step = (fields[1] as List).cast<int>()
+      ..is_level_complete = fields[2] as bool
+      ..is_step_complete = (fields[4] as List).cast<bool>();
   }
 
   @override
   void write(BinaryWriter writer, Progressing obj) {
     writer
-      ..writeByte(5)
-      ..writeByte(0)
-      ..write(obj.level)
+      ..writeByte(3)
       ..writeByte(1)
       ..write(obj.step)
       ..writeByte(2)
-      ..write(obj.step_range)
-      ..writeByte(3)
       ..write(obj.is_level_complete)
       ..writeByte(4)
       ..write(obj.is_step_complete);

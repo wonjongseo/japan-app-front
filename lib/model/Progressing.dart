@@ -7,31 +7,28 @@ import 'package:sqflite/sqlite_api.dart';
 part 'Progressing.g.dart';
 
 @HiveType(typeId: progressHiveType)
-class Progressing {
-  @HiveField(0)
-  int? level;
+class Progressing extends HiveObject {
   @HiveField(1)
-  List? step;
+  List<int> step = List.filled(10, 0);
 
   @HiveField(2)
-  int? step_range;
-
-  @HiveField(3)
   bool is_level_complete = false;
 
   @HiveField(4)
-  bool is_step_complete = false;
-
-  Progressing({this.level, this.step, this.step_range});
+  List<bool> is_step_complete = List.filled(10, false);
 
   Map<String, dynamic> toMap() {
     return {
-      'level': level,
       'step': step,
-      'step_range': step_range,
       'is_level_complete': is_level_complete,
       'is_step_complete': is_step_complete
     };
+  }
+
+  @override
+  String toString() {
+    return '''
+Progressing( step $step is_step_complete $is_step_complete )''';
   }
 }
 

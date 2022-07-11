@@ -6,6 +6,7 @@ import 'package:japan_front/Palette.dart';
 import 'package:japan_front/components/CAppber.dart';
 import 'package:japan_front/error_widget.dart';
 import 'package:japan_front/hive/hive_db.dart';
+import 'package:japan_front/model/Kangi.dart';
 import 'package:japan_front/model/Progressing.dart';
 import 'package:japan_front/model/enum/api_request_status.dart';
 import 'package:japan_front/provider/HomeProver.dart';
@@ -19,32 +20,36 @@ class JlptLevel extends StatefulWidget {
   State<JlptLevel> createState() => _JlptLevelState();
 }
 
-class _JlptLevelState extends State<JlptLevel>
-    with AutomaticKeepAliveClientMixin {
-  DateTime currentBackPressTime = DateTime.now();
+class _JlptLevelState extends State<JlptLevel> {
+  ScrollController? _scrollController;
+  List<Kangi>? kangisOFLevel;
+  Map? progressing;
+
+  int page = 1;
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    _getProgress();
-  }
 
-  @override
-  bool get wantKeepAlive => true;
+    _scrollController = ScrollController();
 
-  void _getProgress() async {
-    SchedulerBinding.instance.addPostFrameCallback(
-      (_) => Provider.of<HomeProvider>(context, listen: false).getProgressing(),
-    );
+    _scrollController!.addListener((() {
+      if (_scrollController!.offset >=
+              _scrollController!.position.maxScrollExtent &&
+          !_scrollController!.position.outOfRange) {
+        print('bottom');
+        page++;
+      }
+    }));
+    // _getProgress();
   }
 
   @override
   Widget build(BuildContext context) {
-    super.build(context);
-    return Consumer(
-      builder:
-          (BuildContext context, HomeProvider homeProvider, Widget? child) =>
-              Scaffold(
+    return Consumer(builder:
+        (BuildContext context, HomeProvider homeProvider, Widget? child) {
+      return Scaffold(
         appBar: getCustomAppBar(
           'N${widget.level}',
         ),
@@ -53,6 +58,7 @@ class _JlptLevelState extends State<JlptLevel>
                 ? Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: GridView.builder(
+                      controller: _scrollController,
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
                         mainAxisSpacing: 15,
@@ -77,7 +83,7 @@ class _JlptLevelState extends State<JlptLevel>
                                   Row(
                                       mainAxisAlignment: MainAxisAlignment.end,
                                       children: [
-                                        false
+                                        true
                                             ? Icon(
                                                 Icons.check_circle,
                                                 color: Colors.green,
@@ -95,7 +101,7 @@ class _JlptLevelState extends State<JlptLevel>
                                       fontSize: 27,
                                     ),
                                   ),
-                                  Text('0/15'),
+                                  Text('${0}/${15}'),
                                 ],
                               ),
                             )),
@@ -115,10 +121,11 @@ class _JlptLevelState extends State<JlptLevel>
                       itemCount: 10,
                     ),
                   )
-                : (homeProvider.apiRequestStatus == ApiRequestStatus.loading)
-                    ? CircularProgressIndicator()
-                    : ErrorLoadedWidget()),
-      ),
-    );
+                : CircularProgressIndicator()),
+        // (homeProvider.apiRequestStatus == ApiRequestStatus.loading)
+
+        // : ErrorLoadedWidget()),
+      );
+    });
   }
 }
