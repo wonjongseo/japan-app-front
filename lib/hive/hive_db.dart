@@ -58,13 +58,13 @@ class HiveDB {
 // Progreesing
 
   void changeStepByLevel(int level, int step, int currentStep) {
-    Progressing progressing = _jlptProgressing!.get(level) as Progressing;
+    Progressing progressing = _jlptProgressing!.get(level.toString())!;
     progressing.step[step] = currentStep;
     progressing.save();
   }
 
   void completePart(int level, int step) {
-    Progressing progressing = _jlptProgressing!.get(level) as Progressing;
+    Progressing progressing = _jlptProgressing!.get(level.toString())!;
     progressing.is_step_complete[step - 1] = true;
     progressing.save();
   }

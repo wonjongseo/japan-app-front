@@ -21,16 +21,9 @@ class HomeProvider extends ChangeNotifier {
     }
   }
 
-  Map getTotalCntOfLevel() {
-    Map result = {};
-
-    for (int level = 1; level <= 5; level++) {
-      result[level] = kangis.values
-          .where((kangi) => int.parse(kangi.level) == level)
-          .length;
-    }
-
-    return result;
+  List getTotalCntOfLevel(int level) {
+    print(progressing);
+    return (progressing[level.toString()] as Progressing).step;
   }
 
   List getKangiByLevel(int level) {

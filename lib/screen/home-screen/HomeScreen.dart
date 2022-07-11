@@ -76,8 +76,6 @@ class _CustomButtonState extends State<CustomButton> {
   @override
   Widget build(BuildContext context) {
     return Consumer(builder: (context, HomeProvider homeProvider, child) {
-      map = homeProvider.getTotalCntOfLevel();
-
       return Container(
         height: MediaQuery.of(context).size.height / 7,
         margin: EdgeInsets.symmetric(vertical: 10),

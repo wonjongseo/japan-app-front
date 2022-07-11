@@ -12,6 +12,8 @@ import 'package:japan_front/model/enum/api_request_status.dart';
 import 'package:japan_front/provider/HomeProver.dart';
 import 'package:provider/provider.dart';
 
+const int COUNT = 15;
+
 class JlptLevel extends StatefulWidget {
   final String level;
   JlptLevel(this.level);
@@ -49,6 +51,8 @@ class _JlptLevelState extends State<JlptLevel> {
   Widget build(BuildContext context) {
     return Consumer(builder:
         (BuildContext context, HomeProvider homeProvider, Widget? child) {
+      List step_list = homeProvider.getTotalCntOfLevel(int.parse(widget.level));
+
       return Scaffold(
         appBar: getCustomAppBar(
           'N${widget.level}',
@@ -83,7 +87,7 @@ class _JlptLevelState extends State<JlptLevel> {
                                   Row(
                                       mainAxisAlignment: MainAxisAlignment.end,
                                       children: [
-                                        true
+                                        step_list[index] == COUNT
                                             ? Icon(
                                                 Icons.check_circle,
                                                 color: Colors.green,
@@ -101,7 +105,7 @@ class _JlptLevelState extends State<JlptLevel> {
                                       fontSize: 27,
                                     ),
                                   ),
-                                  Text('${0}/${15}'),
+                                  Text('${step_list[index]}/${15}'),
                                 ],
                               ),
                             )),
@@ -111,9 +115,6 @@ class _JlptLevelState extends State<JlptLevel> {
                                 return JlptKangiCards(
                                     int.parse(widget.level), index + 1);
                               })));
-                              // HiveDB.instance.addToProgressive(
-                              //   widget.level,
-                              // );
                             },
                           ),
                         );
