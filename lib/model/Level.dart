@@ -21,6 +21,6 @@ class Level {
   @override
   String toString() {
     return '''
-Level(parts: $parts, totalCnt $totalCnt complete: $complete)''';
+Level(parts: ${parts}, totalCnt $totalCnt complete: $complete)''';
   }
 }

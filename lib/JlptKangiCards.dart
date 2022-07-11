@@ -8,7 +8,6 @@ import 'package:japan_front/constants/configs.dart';
 import 'package:japan_front/hive/hive_db.dart';
 import 'package:japan_front/model/Kangi.dart';
 import 'package:http/http.dart' as http;
-import 'package:japan_front/model/Progressing.dart';
 import 'package:japan_front/provider/HomeProver.dart';
 import 'package:provider/provider.dart';
 
@@ -210,15 +209,6 @@ class _JlptKangiCardState extends State<JlptKangiCard> {
                                     onPressed: () {
                                       knownVocaCnt++;
                                       if (index + 1 == widget.kangis.length) {
-                                        if (knownVocaCnt ==
-                                            widget.kangis.length) {
-                                          homeProvider.completePart(
-                                              widget.level, widget.step);
-                                        }
-                                        homeProvider.changeStepByLevel(
-                                            widget.level,
-                                            widget.step - 1,
-                                            knownVocaCnt);
                                         return Navigator.of(context).pop();
                                       }
                                       isButtonClick.fillRange(0, 3, false);

@@ -3,6 +3,9 @@ import 'package:flutter/scheduler.dart';
 import 'package:japan_front/JlptLevel.dart';
 import 'package:japan_front/components/CAppber.dart';
 import 'package:japan_front/hive/hive_db.dart';
+import 'package:japan_front/model/Level.dart';
+import 'package:japan_front/model/Part.dart';
+import 'package:japan_front/model/enum/api_request_status.dart';
 import 'package:japan_front/provider/HomeProver.dart';
 import 'package:provider/provider.dart';
 
@@ -20,7 +23,8 @@ class _HomeScreenState extends State<HomeScreen> {
     // TODO: implement initState
     super.initState();
     SchedulerBinding.instance.addPostFrameCallback(
-      (_) => Provider.of<HomeProvider>(context, listen: false).getProgressing(),
+      (_) => Provider.of<HomeProvider>(context, listen: false)
+          .getLevelBoxFromServer(),
     );
   }
 
@@ -29,7 +33,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: (() {
-          HiveDB.instance.deleteProgressingAll();
+          HiveDB.instance.deleteAll();
           HiveDB.instance.deleteKangisAll();
         }),
         child: Icon(Icons.add),
@@ -55,6 +59,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
 class CustomButton extends StatefulWidget {
   final int level;
+
   CustomButton(this.level);
 
   @override
@@ -62,75 +67,80 @@ class CustomButton extends StatefulWidget {
 }
 
 class _CustomButtonState extends State<CustomButton> {
-  int totalCnt = 0;
-  Map? map;
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    SchedulerBinding.instance.addPostFrameCallback(
+      (_) => Provider.of<HomeProvider>(context, listen: false)
+          .getLevelBoxFromServer(),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Consumer(builder: (context, HomeProvider homeProvider, child) {
-      return Container(
-        height: MediaQuery.of(context).size.height / 7,
-        margin: EdgeInsets.symmetric(vertical: 10),
-        child: ElevatedButton(
-            style: ButtonStyle(),
-            onPressed: () {
-              Navigator.of(context).push(MaterialPageRoute(
-                  builder: ((context) => JlptLevel(widget.level.toString()))));
-            },
-            child: Padding(
-              padding:
-                  const EdgeInsets.only(top: 8.0, bottom: 8, left: 2, right: 2),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  totalCnt == 0
-                      ? Text('미학습')
-                      : totalCnt == 1000
-                          ? Text('학습 완료')
-                          : Text('학습중'),
-                  Text('N${widget.level}'),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Container(
-                        width: MediaQuery.of(context).size.width - 180,
-                        child: SliderTheme(
-                          child: Slider(
-                            // value: HiveDB.instance
-                            //     .getProgressiveLevel(level.toString()),
-                            value: double.parse(totalCnt.toString()),
-                            max: 1000,
-                            min: 0,
-                            activeColor: Colors.black,
-                            inactiveColor: Colors.grey,
-                            onChanged: (double value) {},
-                          ),
-                          data: SliderTheme.of(context).copyWith(
-                            // slider height
-                            trackHeight: 10,
-                            // remove padding
-                            overlayShape: SliderComponentShape.noOverlay,
-                            thumbShape:
-                                RoundSliderThumbShape(enabledThumbRadius: 0.0),
-                          ),
-                        ),
-                      ),
-                      Text(
-                        '학습률: ${totalCnt} / 1000 [0%]',
-                        style: TextStyle(fontSize: 10),
-                      )
-                    ],
-                  )
-                ],
-              ),
-            )),
-      );
+      return (homeProvider.apiRequestStatus == ApiRequestStatus.loaded)
+          ? Container(
+              height: MediaQuery.of(context).size.height / 7,
+              margin: EdgeInsets.symmetric(vertical: 10),
+              child: ElevatedButton(
+                  style: ButtonStyle(),
+                  onPressed: () {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: ((context) => JlptLevel(
+                            widget.level.toString(),
+                            homeProvider.levels[widget.level]?.parts))));
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.only(
+                        top: 8.0, bottom: 8, left: 2, right: 2),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        homeProvider.levels[widget.level] == 0
+                            ? Text('미학습')
+                            : homeProvider.levels[widget.level] ==
+                                    homeProvider.levels[widget.level]?.totalCnt
+                                ? Text('학습 완료')
+                                : Text('학습중'),
+                        Text('N${widget.level}'),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Container(
+                              width: MediaQuery.of(context).size.width - 180,
+                              child: SliderTheme(
+                                child: Slider(
+                                  value: 0,
+                                  max: 1000,
+                                  min: 0,
+                                  activeColor: Colors.black,
+                                  inactiveColor: Colors.grey,
+                                  onChanged: (double value) {},
+                                ),
+                                data: SliderTheme.of(context).copyWith(
+                                  // slider height
+                                  trackHeight: 10,
+                                  // remove padding
+                                  overlayShape: SliderComponentShape.noOverlay,
+                                  thumbShape: RoundSliderThumbShape(
+                                      enabledThumbRadius: 0.0),
+                                ),
+                              ),
+                            ),
+                            Text(
+                              '학습률: 0 / ${homeProvider.levels[widget.level]?.totalCnt} [0%]',
+                              style: TextStyle(fontSize: 10),
+                            )
+                          ],
+                        )
+                      ],
+                    ),
+                  )),
+            )
+          : Text('asd');
     });
   }
 }

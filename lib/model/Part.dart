@@ -23,6 +23,6 @@ class Part {
   @override
   String toString() {
     return '''
-Part(kangis: $kangis, last_index $last_index restKangis: $restKangis)''';
+Part(kangis: ${kangis!.length}, last_index $last_index restKangis: $restKangis)''';
   }
 }
