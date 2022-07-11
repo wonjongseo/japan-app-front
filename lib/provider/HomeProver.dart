@@ -1,12 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:japan_front/hive/hive_db.dart';
 import 'package:japan_front/model/Kangi.dart';
+import 'package:japan_front/model/Level.dart';
 import 'package:japan_front/model/Progressing.dart';
 import 'package:japan_front/model/enum/api_request_status.dart';
 
 class HomeProvider extends ChangeNotifier {
   late Map kangis;
   late Map progressing;
+  late Level levels;
+
+  void initServerData() async {
+    try {
+      HiveDB.instance.getLevelsData();
+    } on Exception catch (e) {
+      print(e);
+    }
+  }
+
   ApiRequestStatus apiRequestStatus = ApiRequestStatus.loading;
 
   void getProgressing() async {

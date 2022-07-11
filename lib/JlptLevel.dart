@@ -1,13 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:japan_front/JlptKangiCards.dart';
-import 'package:japan_front/Palette.dart';
 import 'package:japan_front/components/CAppber.dart';
-import 'package:japan_front/error_widget.dart';
-import 'package:japan_front/hive/hive_db.dart';
 import 'package:japan_front/model/Kangi.dart';
-import 'package:japan_front/model/Progressing.dart';
 import 'package:japan_front/model/enum/api_request_status.dart';
 import 'package:japan_front/provider/HomeProver.dart';
 import 'package:provider/provider.dart';

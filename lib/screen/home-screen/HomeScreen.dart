@@ -68,9 +68,6 @@ class _CustomButtonState extends State<CustomButton> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    // SchedulerBinding.instance.addPostFrameCallback(
-    //   (_) => Provider.of<HomeProvider>(context, listen: false).getProgressing(),
-    // );
   }
 
   @override

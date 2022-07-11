@@ -34,8 +34,8 @@ class _JlptKangiCardsState extends State<JlptKangiCards> {
   late Future<List<Kangi>> futureKangis;
 
   void getJlptKangis() {
-    futureKangis = new KangiNetwork(Api.getKangisByJlptLevel)
-        .getKangisByLevel(http.Client(), widget.level, widget.step);
+    futureKangis = new KangiNetwork(Api.getKangiByJlptLevel)
+        .getKangiByLevel(http.Client(), widget.level, widget.step);
   }
 
   @override
