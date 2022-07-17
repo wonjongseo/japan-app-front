@@ -5,7 +5,7 @@ import 'package:japan_front/model/Kangi.dart';
 part 'Part.g.dart';
 
 @HiveType(typeId: partHiveType)
-class Part {
+class Part extends HiveObject {
   @HiveField(0)
   List<Kangi>? kangis;
 

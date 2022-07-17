@@ -19,19 +19,23 @@ class LevelAdapter extends TypeAdapter<Level> {
     return Level(
       (fields[0] as List?)?.cast<Part>(),
       fields[1] as int?,
-    )..complete = fields[2] as bool;
+    )
+      ..complete = fields[2] as bool
+      ..lastIndex = fields[3] as int;
   }
 
   @override
   void write(BinaryWriter writer, Level obj) {
     writer
-      ..writeByte(3)
+      ..writeByte(4)
       ..writeByte(0)
       ..write(obj.parts)
       ..writeByte(1)
       ..write(obj.totalCnt)
       ..writeByte(2)
-      ..write(obj.complete);
+      ..write(obj.complete)
+      ..writeByte(3)
+      ..write(obj.lastIndex);
   }
 
   @override

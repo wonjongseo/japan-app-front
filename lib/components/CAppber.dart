@@ -6,6 +6,7 @@ PreferredSize getCustomAppBar(String title) {
     return PreferredSize(
       preferredSize: Size.fromHeight(40),
       child: AppBar(
+        elevation: 0,
         centerTitle: false,
         title: Text(
           title,
@@ -27,6 +28,7 @@ PreferredSize getCustomAppBar(String title) {
   return PreferredSize(
     preferredSize: Size.fromHeight(40),
     child: AppBar(
+      elevation: 0,
       leading: Builder(builder: (context) {
         return IconButton(
           onPressed: () {

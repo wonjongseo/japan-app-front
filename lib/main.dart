@@ -1,11 +1,11 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:get/route_manager.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:japan_front/Palette.dart';
+import 'package:japan_front/binding/initBinding.dart';
 import 'package:japan_front/hive/hive_db.dart';
-import 'package:japan_front/provider/HomeProver.dart';
-import 'package:japan_front/screen/home-screen/HomeScreen.dart';
+import 'package:japan_front/page/app.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
@@ -15,10 +15,7 @@ void main() async {
   await Hive.initFlutter();
   await HiveDB.init();
 
-  runApp(MultiProvider(
-    providers: [ChangeNotifierProvider(create: (_) => HomeProvider())],
-    child: MyApp(),
-  ));
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -26,18 +23,15 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
       darkTheme: ThemeData.dark(),
       theme: ThemeData(
         colorScheme: ColorScheme.fromSwatch(primarySwatch: Palette.kToDark),
       ),
       debugShowCheckedModeBanner: false,
       title: "Japanese App",
-      initialRoute: HomeScreen.id,
-      routes: {
-        HomeScreen.id: (context) => HomeScreen(),
-        // RelatedJapan.id: (context) => RelatedJapan(),
-      },
+      initialBinding: InitBinding(),
+      home: const App(),
     );
   }
 }

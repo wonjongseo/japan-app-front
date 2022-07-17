@@ -9,7 +9,7 @@ import 'package:http/http.dart' as http;
 
 class HiveDB {
   static Box<Map>? _box;
-  static Box<Kangi>? _kangiBox;
+  static Box<List<Kangi>>? _kangiBox;
   static Box<String>? _likedBox;
   static Box<Level>? _levelBox;
   static Box<Part>? _partBox;
@@ -32,6 +32,19 @@ class HiveDB {
     _partBox = await Hive.openBox(partHiveDB);
   }
 
+// Kangis
+
+  void saveKangis(String key, List<Kangi> kangis) {
+    if (_kangiBox!.get(key) == null) {
+      _kangiBox!.put(key, []);
+    }
+    _kangiBox!.get(key)!.addAll(kangis);
+  }
+
+  List<Kangi>? getKangis(String key) {
+    return _kangiBox!.get(key);
+  }
+
   Map getLevelsData() {
     if (_levelBox!.isEmpty) {
       addLevelsData();
@@ -43,6 +56,24 @@ class HiveDB {
     print('deleteALl !');
     _levelBox!.deleteFromDisk();
     _partBox!.deleteFromDisk();
+  }
+
+  void updateLastIndet(int level, int step) {
+    Level changedLevel = _levelBox!.get(level)!;
+    List<bool> ok = List.filled(2, false);
+
+    if (changedLevel.parts![step].last_index <
+        changedLevel.parts![step].kangis!.length) {
+      changedLevel.parts?[step].last_index++;
+      ok[0] = true;
+    }
+    // changedLevel.lastIndex++;
+    if (changedLevel.lastIndex < changedLevel.totalCnt!) {
+      changedLevel.lastIndex++;
+      ok[1] = true;
+    }
+    // changedLevel.save();
+    if (ok[0] == true || ok[1] == true) changedLevel.save();
   }
 
   void addLevelsData() async {
@@ -144,19 +175,10 @@ class HiveDB {
   Map getKangiAll() {
     if (_kangiBox!.isEmpty) {
       print("kangiBox is empty");
-      addKangiAll();
     }
     print(_kangiBox!.toMap());
 
     return _kangiBox!.toMap();
-  }
-
-  void addKangiAll() async {
-    KangiNetwork(Api.getKangisAll).getKangisAll(http.Client()).then((value) {
-      for (var kangi in value) {
-        _kangiBox!.put(kangi.id, kangi);
-      }
-    });
   }
 
   void deleteKangisAll() {
@@ -164,8 +186,9 @@ class HiveDB {
     _kangiBox!.deleteFromDisk();
   }
 
-  List<Kangi> getKangiByLevel(String level) {
-    return _kangiBox!.values.where((kangi) => kangi.level == level).toList();
+  List<Kangi>? getKangiByLevel(String level) {
+    // return _kangiBox!.values.where((kangi) => kangi.level == level).toList();
+    return null;
   }
 
   Map getLiked() {
