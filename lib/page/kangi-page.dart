@@ -9,6 +9,8 @@ import 'package:japan_front/controller/kangiController.dart';
 import 'package:japan_front/model/enum/api_request_status.dart';
 import 'package:japan_front/page/JlptKangiCards.dart';
 
+import '../model/Kangi.dart';
+
 class KangiPage extends GetView<KangiController> {
   final int level;
   KangiPage({Key? key, required this.level}) : super(key: key);
@@ -80,19 +82,25 @@ class KangiPage extends GetView<KangiController> {
                           )),
                           onPressed: () {
                             print(index);
-                            Get.to(() => JlptKangiCard(
-                                level,
-                                index,
-                                controller.kangis[level]!
-                                    .sublist(index, index + 15)));
+                            Get.to(() =>
+                                JlptKangiCard(level, index, trimKangis(index)));
                           },
                         ),
                       );
                     },
-                    itemCount: (controller.kangis[level]!.length / 15).floor(),
+                    itemCount: (controller.kangis[level]!.length / 15).ceil(),
                   ),
                 )
               : CircularProgressIndicator()),
     );
+  }
+
+  List<Kangi> trimKangis(int index) {
+    print(index);
+    if (index * 15 + 15 > controller.kangis[level]!.length) {
+      return controller.kangis[level]!.sublist(index * 15);
+    }
+
+    return controller.kangis[level]!.sublist(index * 15, index * 15 + 15);
   }
 }

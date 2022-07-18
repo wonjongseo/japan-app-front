@@ -6,7 +6,6 @@ import 'package:japan_front/Palette.dart';
 import 'package:japan_front/binding/initBinding.dart';
 import 'package:japan_front/hive/hive_db.dart';
 import 'package:japan_front/page/app.dart';
-import 'package:provider/provider.dart';
 
 void main() async {
   // main 에서 비동기 사용

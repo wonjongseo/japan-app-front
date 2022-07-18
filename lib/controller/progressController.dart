@@ -32,13 +32,13 @@ class ProgressController extends GetxController {
     return '${level}-${step}';
   }
 
-  List<Kangi>? _getUnknownKangi(String key) {
+  List<Kangi>? getUnknownKangi(String key) {
     return unKnownKangis.value[key];
   }
 
   void save(int level, int step) {
     String key = _makeKey(level, step);
-    List<Kangi>? kangis = _getUnknownKangi(key);
+    List<Kangi>? kangis = getUnknownKangi(key);
     HiveDB.instance.saveKangis(key, kangis!);
   }
 }
