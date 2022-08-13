@@ -1,12 +1,13 @@
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
+import 'package:japan_front/api/api.dart';
 import 'package:japan_front/model/Kangi.dart';
 import 'package:http/http.dart' as http;
 
-class KangiNetwork {
+class WordNetwork {
   final String url;
-  KangiNetwork(this.url);
+  WordNetwork(this.url);
 
   Future<List<Kangi>> getKangisAll(http.Client client) async {
     String newUrl = this.url;
@@ -22,8 +23,8 @@ class KangiNetwork {
     }
   }
 
-  Future<List<Kangi>> getKangisByLevel(http.Client client, int n) async {
-    String newUrl = this.url + "?n=" + n.toString();
+  Future<List<Kangi>> getKangisByLevel(http.Client client, String n) async {
+    String newUrl = this.url + "?n=" + n;
 
     var url = Uri.parse(newUrl);
     var response = await client.get(url);
@@ -36,9 +37,8 @@ class KangiNetwork {
   }
 
   Future<List<Kangi>> getKangiByLevel(
-      http.Client client, int n, int? step) async {
-    String newUrl =
-        this.url + "?n=" + n.toString() + "&step=" + step.toString();
+      http.Client client, String n, int? step) async {
+    String newUrl = this.url + "?n=" + n + "&step=" + step.toString();
 
     var url = Uri.parse(newUrl);
     var response = await client.get(url);

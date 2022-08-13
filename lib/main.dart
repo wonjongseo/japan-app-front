@@ -5,6 +5,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:japan_front/Palette.dart';
 import 'package:japan_front/binding/initBinding.dart';
 import 'package:japan_front/hive/hive_db.dart';
+import 'package:japan_front/model/Kangi.dart';
 import 'package:japan_front/page/app.dart';
 
 void main() async {

@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
-import 'package:japan_front/controller/progressController.dart';
 import 'package:japan_front/page/Related_Japan.dart';
 import 'package:japan_front/api/api.dart';
-import 'package:japan_front/api/kangiNetwork.dart';
+import 'package:japan_front/api/wordNetwork.dart';
 import 'package:japan_front/components/CAppber.dart';
 import 'package:japan_front/constants/configs.dart';
 import 'package:japan_front/hive/hive_db.dart';
 import 'package:japan_front/model/Kangi.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class JlptKangiCard extends StatefulWidget {
   final int level;
@@ -28,11 +28,8 @@ class _JlptKangiCardState extends State<JlptKangiCard> {
   int index = 0;
 
   @override
-  void dispose() {
-    // TODO: implement dispose
-    // ProgressController.to.save(widget.level, widget.step);
-
-    super.dispose();
+  void initState() {
+    super.initState();
   }
 
   void showMessage() {}
@@ -167,82 +164,7 @@ class _JlptKangiCardState extends State<JlptKangiCard> {
                               onPressed: () {
                                 isButtonClick.fillRange(0, 3, false);
 
-                                if (index + 1 == widget.kangis!.length) {
-                                  var unKnownKangi = ProgressController.to
-                                      .getUnknownKangi(
-                                          '${widget.level}-${widget.step}');
-
-                                  if (unKnownKangi != null) {
-                                    if (unKnownKangi.length != 0) {
-                                      showDialog(
-                                          context: context,
-                                          builder: (ctx) {
-                                            return Container(
-                                              child: Text("asdasd"),
-                                            );
-                                          });
-                                      // showDialog(
-                                      //     context: context,
-                                      //     builder: (BuildContext context2) {
-                                      //       return AlertDialog(
-                                      //         title: Text(
-                                      //           "知らない単語が${unKnownKangi.length}個残っています。",
-                                      //           style: TextStyle(fontSize: 18),
-                                      //         ),
-                                      //         content: const Text(
-                                      //           '単語を混ざろうとはOKボタンを押してください。',
-                                      //           style: TextStyle(fontSize: 11),
-                                      //         ),
-                                      //         actions: <Widget>[
-                                      //           Row(
-                                      //             children: [
-                                      //               TextButton(
-                                      //                 onPressed: () {
-                                      //                   Navigator.pop(context2,
-                                      //                       '다른 레벨 보기');
-                                      //                   Navigator.pop(context);
-                                      //                 },
-                                      //                 child:
-                                      //                     const Text('出てきます'),
-                                      //               ),
-                                      //               TextButton(
-                                      //                 onPressed: () {
-                                      //                   Navigator.pop(
-                                      //                       context2, 'OK');
-                                      //                   unKnownKangi.shuffle();
-                                      //                   Get.to(() =>
-                                      //                       JlptKangiCard(
-                                      //                           widget.level,
-                                      //                           widget.step,
-                                      //                           unKnownKangi));
-                                      //                 },
-                                      //                 child:
-                                      //                     const Text('混ざります。'),
-                                      //               ),
-                                      //               TextButton(
-                                      //                 onPressed: () =>
-                                      //                     Navigator.pop(
-                                      //                         context2, 'OK'),
-                                      //                 child:
-                                      //                     const Text('もっと見せます'),
-                                      //               ),
-                                      //             ],
-                                      //           )
-                                      //         ],
-                                      //       );
-                                      //     });
-
-                                    }
-                                  }
-                                  return Navigator.of(context).pop();
-                                }
-                                setState(() {
-                                  ProgressController.to.addUnknownKangi(
-                                      widget.kangis![index],
-                                      widget.level,
-                                      widget.step);
-                                  index++;
-                                });
+                                setState(() {});
                               },
                               child: Text('모르겠습니다.')),
                         ],
