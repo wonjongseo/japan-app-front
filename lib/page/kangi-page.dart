@@ -1,9 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
+
+import 'package:http/http.dart' as http;
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:get/get.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
+import 'package:japan_front/api/wordNetworktest.dart';
 import 'package:japan_front/components/Button.dart';
 import 'package:japan_front/components/CAppber.dart';
 import 'package:japan_front/controller/kangiController.dart';
@@ -12,10 +15,11 @@ import 'package:japan_front/page/JlptKangiCards.dart';
 
 import '../model/Kangi.dart';
 
-class KangiPage extends GetView<KangiController> {
+// ignore: must_be_immutable
+class StepPage extends GetView<KangiController> {
   final String level;
   List<Kangi>? kangis;
-  KangiPage({Key? key, required this.level, this.kangis}) : super(key: key);
+  StepPage({Key? key, required this.level, this.kangis}) : super(key: key);
   ScrollController? _scrollController = ScrollController();
 
   @override
@@ -25,15 +29,14 @@ class KangiPage extends GetView<KangiController> {
         '${level}',
       ),
       body: SafeArea(
-          child: kangis != null
-              ? _Screen(kangis)
-              : (controller.status[level] == ApiRequestStatus.loaded)
-                  ? _Screen(controller.kangis[level])
-                  : CircularProgressIndicator()),
+        child: kangis != null ? _Screen(kangis) : _Screen(controller.kangis),
+      ),
     );
   }
 
   Widget _Screen(List<Kangi>? kangis) {
+    print('aasd');
+    print(kangis?.length);
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: GridView.builder(
@@ -63,9 +66,9 @@ class KangiPage extends GetView<KangiController> {
                     Text(
                       '${index + 1}',
                       style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 27,
-                      ),
+                          fontWeight: FontWeight.w600,
+                          fontSize: 27,
+                          color: Colors.black),
                     ),
                     Text('')
                     // Text('${0}/${controller.kangis[level]!.length}')
@@ -74,7 +77,7 @@ class KangiPage extends GetView<KangiController> {
               )),
               onPressed: () {
                 Get.to(
-                    () => JlptKangiCard(1, index, trimKangis(kangis!, index)));
+                    () => WordCardPage(1, index, trimKangis(kangis!, index)));
               },
             ),
           );

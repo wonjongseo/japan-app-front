@@ -5,21 +5,24 @@ import 'package:get/get.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
 import 'package:japan_front/api/wordNetwork.dart';
 import 'package:japan_front/api/wordNetworktest.dart';
+import 'package:japan_front/components/Button.dart';
 import 'package:japan_front/components/CAppber.dart';
 import 'package:japan_front/controller/kangiController.dart';
 import 'package:japan_front/hive/hive_db.dart';
 import 'package:japan_front/page/kangi-page.dart';
 
-class NLevel extends GetView<KangiController> {
+class NLevelPage extends GetView<KangiController> {
   Widget _customButton(String level, BuildContext context) {
     return Container(
       height: Get.width / 4,
       margin: EdgeInsets.symmetric(vertical: 10),
       child: ElevatedButton(
+          style: getCButtonStyle(),
           onPressed: () async {
             try {
-              await controller.loadKangisByLevel(level);
-              Get.to(() => KangiPage(level: "N" + level));
+              await controller.loadKangisByLevels(level);
+
+              Get.to(() => StepPage(level: "N" + level));
             } on Exception catch (e) {
               print(e);
               return;
@@ -32,8 +35,14 @@ class NLevel extends GetView<KangiController> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('미학습'),
-                Text('N${0}'),
+                Text(
+                  '미학습',
+                  style: TextStyle(color: Colors.black),
+                ),
+                Text(
+                  'N${level}',
+                  style: TextStyle(color: Colors.black),
+                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -56,7 +65,10 @@ class NLevel extends GetView<KangiController> {
                         ),
                       ),
                     ),
-                    Text('N${0}'),
+                    Text(
+                      'N${level}',
+                      style: TextStyle(color: Colors.black),
+                    ),
                   ],
                 )
               ],
@@ -68,13 +80,6 @@ class NLevel extends GetView<KangiController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: (() async {
-          // HiveDB.instance.deleteAll();
-          // HiveDB.instance.deleteKangisAll();
-        }),
-        child: Icon(Icons.add),
-      ),
       appBar: getCustomAppBar('일본어 단어'),
       body: Container(
         margin: EdgeInsets.symmetric(vertical: 15, horizontal: 10),

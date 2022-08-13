@@ -7,27 +7,40 @@ import 'package:japan_front/model/enum/api_request_status.dart';
 
 class KangiController extends GetxController {
   static KangiController get to => Get.find();
+  List<Kangi> kangis = [];
+  bool status = false;
+  // RxMap<String, List<Kangi>> kangis = Map<String, List<Kangi>>().obs;
+  // RxMap<String, ApiRequestStatus> status = Map<String, ApiRequestStatus>().obs;
 
-  RxMap<String, List<Kangi>> kangis = Map<String, List<Kangi>>().obs;
-  RxMap<String, ApiRequestStatus> status = Map<String, ApiRequestStatus>().obs;
-
-  Future<void> loadKangisByLevel(String level) async {
-    if (kangis[level] != null) return;
-
-    status[level] = ApiRequestStatus.loading;
-
+  Future<void> loadKangisByLevels(String level) async {
     try {
-      await WordNetwork(Api.getKangisByJlptLevel)
-          .getKangisByLevel(http.Client(), level)
-          .then((value) {
-        kangis[level] = value;
-        status[level] = ApiRequestStatus.loaded;
-      });
+      kangis = await WordNetwork(Api.getKangisByJlptLevel)
+          .getKangisByLevel(http.Client(), level);
 
-      print(kangis[level]);
+      status = true;
     } on Exception catch (e) {
       print(e);
       return;
     }
   }
+
+  // Future<void> loadKangisByLevel(String level) async {
+  //   if (kangis[level] != null) return;
+
+  //   status[level] = ApiRequestStatus.loading;
+
+  //   try {
+  //     await WordNetwork(Api.getKangisByJlptLevel)
+  //         .getKangisByLevel(http.Client(), level)
+  //         .then((value) {
+  //       kangis[level] = value;
+  //       status[level] = ApiRequestStatus.loaded;
+  //     });
+
+  //     print(kangis[level]);
+  //   } on Exception catch (e) {
+  //     print(e);
+  //     return;
+  //   }
+  // }
 }

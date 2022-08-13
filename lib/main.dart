@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:get/route_manager.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:japan_front/Palette.dart';
 import 'package:japan_front/binding/initBinding.dart';
 import 'package:japan_front/hive/hive_db.dart';
-import 'package:japan_front/model/Kangi.dart';
 import 'package:japan_front/page/app.dart';
 
 void main() async {
@@ -24,14 +22,29 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-      darkTheme: ThemeData.dark(),
+      // darkTheme: ThemeData.dark(),
+
+      // theme: ThemeData(
+      //   colorScheme: ColorScheme.fromSwatch(primarySwatch: Palette.kToDark),
+      // ),
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSwatch(primarySwatch: Palette.kToDark),
+        brightness: Brightness.light,
+        /* light theme settings */
       ),
+      darkTheme: ThemeData(
+        brightness: Brightness.light,
+        /* dark theme settings */
+      ),
+      themeMode: ThemeMode.light,
+      /* ThemeMode.system to follow system theme, 
+         ThemeMode.light for light theme, 
+         ThemeMode.dark for dark theme
+      */
       debugShowCheckedModeBanner: false,
-      title: "Japanese App",
+      // debugShowCheckedModeBanner: false,
+      title: "WJS Japan Voca``",
       initialBinding: InitBinding(),
-      home: const App(),
+      home: App(),
     );
   }
 }

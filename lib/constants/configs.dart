@@ -6,4 +6,3 @@ const kangiTextStyle = TextStyle(
   fontWeight: FontWeight.bold,
   fontSize: 130,
 );
-const correctButtonStyle = ButtonStyle();

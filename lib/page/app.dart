@@ -1,62 +1,54 @@
 import 'package:flutter/material.dart';
-import 'package:get/get_state_manager/get_state_manager.dart';
-import 'package:get/route_manager.dart';
-import 'package:japan_front/Palette.dart';
-import 'package:japan_front/controller/kangiController.dart';
-import 'package:japan_front/main.dart';
 import 'package:japan_front/page/n-level.dart';
 import 'package:japan_front/screen/grammer/WordsPage.dart';
 
-class App extends GetView<KangiController> {
-  const App({Key? key}) : super(key: key);
+class App extends StatefulWidget {
+  @override
+  State<App> createState() => _AppState();
+}
+
+class _AppState extends State<App> with SingleTickerProviderStateMixin {
+  TabController? _tabController;
+  int _selectedIdx = 0;
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+    _tabController!.addListener(() {
+      print(_tabController!.index.toString());
+      setState(() {
+        _selectedIdx = _tabController!.index;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _tabController!.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Column(
-                  children: [
-                    IconButton(
-                        iconSize: 100,
-                        color: Colors.lightBlue,
-                        onPressed: () {
-                          Get.to(() => NLevel());
-                          // Get.to(() => WordsPage());
-                        },
-                        icon: Icon(
-                          Icons.star_outlined,
-                        )),
-                    Text("JLPT", style: TextStyle(fontWeight: FontWeight.bold))
-                  ],
-                ),
-                SizedBox(
-                  width: 20,
-                ),
-                Column(
-                  children: [
-                    IconButton(
-                        color: Colors.redAccent,
-                        iconSize: 100,
-                        onPressed: () {
-                          // Get.to(() => NLevel());
-                          Get.to(() => WordsPage());
-                        },
-                        icon: Icon(
-                          Icons.star_outlined,
-                        )),
-                    Text("사전순", style: TextStyle(fontWeight: FontWeight.bold))
-                  ],
-                ),
-              ],
-            ),
-          ],
-        ),
+      body: TabBarView(
+        children: [NLevelPage(), WordsPage()],
+        controller: _tabController,
+      ),
+      bottomNavigationBar: TabBar(
+        tabs: [
+          Tab(
+              child: Text("JPLT",
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: _selectedIdx == 0 ? Colors.blue : Colors.black))),
+          Tab(
+              child: Text("사전순",
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: _selectedIdx == 1 ? Colors.blue : Colors.black)))
+        ],
+        controller: _tabController,
       ),
     );
   }

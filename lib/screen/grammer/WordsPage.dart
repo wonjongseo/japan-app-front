@@ -81,10 +81,11 @@ class _WordsPageState extends State<WordsPage> {
                       .getWords(http.Client(), engFirstName[index]);
 
                   Get.to(
-                      () => KangiPage(level: firstName[index], kangis: words));
+                      () => StepPage(level: firstName[index], kangis: words));
                 },
                 child: Text(
                   firstName[index],
+                  style: TextStyle(color: Colors.black),
                 ),
               ),
             );

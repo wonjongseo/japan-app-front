@@ -1,29 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
+import 'package:japan_front/components/Button.dart';
 import 'package:japan_front/page/Related_Japan.dart';
-import 'package:japan_front/api/api.dart';
-import 'package:japan_front/api/wordNetwork.dart';
 import 'package:japan_front/components/CAppber.dart';
 import 'package:japan_front/constants/configs.dart';
-import 'package:japan_front/hive/hive_db.dart';
 import 'package:japan_front/model/Kangi.dart';
-import 'package:http/http.dart' as http;
-import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-class JlptKangiCard extends StatefulWidget {
+class WordCardPage extends StatefulWidget {
   final int level;
   final int step;
   List<Kangi>? kangis;
 
-  JlptKangiCard(this.level, this.step, this.kangis);
+  WordCardPage(this.level, this.step, this.kangis);
 
   @override
-  State<JlptKangiCard> createState() => _JlptKangiCardState();
+  State<WordCardPage> createState() => _WordCardPageState();
 }
 
-class _JlptKangiCardState extends State<JlptKangiCard> {
+class _WordCardPageState extends State<WordCardPage> {
   List<bool> isButtonClick = List.filled(3, false);
   int index = 0;
 
@@ -55,7 +49,11 @@ class _JlptKangiCardState extends State<JlptKangiCard> {
                             fontSize: 17, fontWeight: FontWeight.w600),
                       ),
                       ElevatedButton(
-                        child: Text("연관 단어"),
+                        style: getCButtonStyle(),
+                        child: Text(
+                          "연관 단어",
+                          style: TextStyle(color: Colors.black),
+                        ),
                         onPressed: () {
                           Get.to(() => RelatedJapan(widget.kangis![index].id));
                         },
@@ -84,14 +82,15 @@ class _JlptKangiCardState extends State<JlptKangiCard> {
                       Row(
                         children: [
                           ElevatedButton(
+                              style: getCButtonStyle(),
                               onPressed: () {
                                 setState(() {
                                   isButtonClick[0] = true;
                                 });
                               },
-                              style: correctButtonStyle,
                               child: Text(
                                 '음독',
+                                style: TextStyle(color: Colors.black),
                               )),
                           !isButtonClick[0]
                               ? Text("")
@@ -104,14 +103,15 @@ class _JlptKangiCardState extends State<JlptKangiCard> {
                       Row(
                         children: [
                           ElevatedButton(
+                              style: getCButtonStyle(),
                               onPressed: () {
                                 setState(() {
                                   isButtonClick[1] = true;
                                 });
                               },
-                              style: correctButtonStyle,
                               child: Text(
                                 '훈독',
+                                style: TextStyle(color: Colors.black),
                               )),
                           !isButtonClick[1]
                               ? Text("")
@@ -124,14 +124,15 @@ class _JlptKangiCardState extends State<JlptKangiCard> {
                       Row(
                         children: [
                           ElevatedButton(
+                              style: getCButtonStyle(),
                               onPressed: () {
                                 setState(() {
                                   isButtonClick[2] = true;
                                 });
                               },
-                              style: correctButtonStyle,
                               child: Text(
                                 '의미',
+                                style: TextStyle(color: Colors.black),
                               )),
                           !isButtonClick[2]
                               ? Text("")
@@ -148,6 +149,7 @@ class _JlptKangiCardState extends State<JlptKangiCard> {
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
                           ElevatedButton(
+                            style: getCButtonStyle(),
                             onPressed: () {
                               isButtonClick.fillRange(0, 3, false);
 
@@ -158,15 +160,22 @@ class _JlptKangiCardState extends State<JlptKangiCard> {
                                 index++;
                               });
                             },
-                            child: Text('알고 있습니다.'),
+                            child: Text(
+                              '알고 있습니다.',
+                              style: TextStyle(color: Colors.black),
+                            ),
                           ),
                           ElevatedButton(
+                              style: getCButtonStyle(),
                               onPressed: () {
                                 isButtonClick.fillRange(0, 3, false);
 
                                 setState(() {});
                               },
-                              child: Text('모르겠습니다.')),
+                              child: Text(
+                                '모르겠습니다.',
+                                style: TextStyle(color: Colors.black),
+                              )),
                         ],
                       )
                     ],

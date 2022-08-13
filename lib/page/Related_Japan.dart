@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:japan_front/api/api.dart';
 import 'package:japan_front/api/japanNetwork.dart';
+import 'package:japan_front/components/Button.dart';
 import 'package:japan_front/components/CAppber.dart';
 import 'package:japan_front/model/Japan.dart';
 import 'package:http/http.dart' as http;
+import 'package:japan_front/model/Kangi.dart';
 
 class RelatedJapan extends StatefulWidget {
   static const id = 'RelatedJapan';
@@ -21,7 +23,6 @@ class _RelatedJapanState extends State<RelatedJapan> {
   late List<bool> isClickedYomikata;
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     getRelatedJapan();
   }
@@ -36,33 +37,18 @@ class _RelatedJapanState extends State<RelatedJapan> {
         });
   }
 
-  Widget isLongerThen13Word(String word) {
-    return word.length >= 13
-        ? TextButton(
-            onPressed: () {
-              print(word);
-              _shoWMessage(word);
-            },
-            child: Text(word.substring(0, 13) + "..."),
-          )
-        : Text(
-            word,
-            style: TextStyle(color: Colors.pink),
-          );
-  }
-
-  void _shoWMessage(String word) {
+  void _shoWMessage(Japan word) {
     showDialog(
         context: context,
         builder: (BuildContext ctx) {
           return AlertDialog(
             title: Text(
-              '意味',
-              style: TextStyle(fontSize: 18),
+              word.yomikata,
+              style: TextStyle(fontSize: 17),
             ),
             content: Text(
-              word,
-              style: TextStyle(fontSize: 13),
+              word.korea,
+              style: TextStyle(fontSize: 15),
             ),
             actions: <Widget>[
               SingleChildScrollView(
@@ -75,6 +61,7 @@ class _RelatedJapanState extends State<RelatedJapan> {
                       },
                       child: const Text(
                         'OK',
+                        style: TextStyle(color: Colors.black),
                       ),
                     ),
                   ],
@@ -111,22 +98,33 @@ class _RelatedJapanState extends State<RelatedJapan> {
                       ],
                     ),
                     child: ElevatedButton(
-                      onPressed: () {},
+                      style: getCButtonStyle(),
+                      onPressed: () {
+                        _shoWMessage(snapshot.data![index] as Japan);
+                      },
                       child: Column(
                         children: [
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text('단어 ${index + 1}'),
+                              Text(
+                                '단어 ${index + 1}',
+                                style: TextStyle(color: Colors.black),
+                              ),
                               IconButton(
                                   onPressed: () {},
-                                  icon: Icon(Icons.star_border))
+                                  icon: Icon(
+                                    Icons.star_border,
+                                    color: Colors.black,
+                                  ))
                             ],
                           ),
                           Text(
                             snapshot.data![index].japan,
                             style: TextStyle(
-                                fontSize: 30, fontWeight: FontWeight.w400),
+                                fontSize: 30,
+                                fontWeight: FontWeight.w400,
+                                color: Colors.black),
                             textAlign: TextAlign.center,
                           ),
                           // ]),
@@ -135,11 +133,17 @@ class _RelatedJapanState extends State<RelatedJapan> {
                               children: [
                                 IconButton(
                                   onPressed: () {},
-                                  icon: Icon(Icons.volume_up_rounded),
+                                  icon: Icon(
+                                    Icons.volume_up_rounded,
+                                    color: Colors.black,
+                                  ),
                                 ),
                                 IconButton(
                                   onPressed: () {},
-                                  icon: Icon(Icons.keyboard_arrow_down_sharp),
+                                  icon: Icon(
+                                    Icons.keyboard_arrow_down_sharp,
+                                    color: Colors.black,
+                                  ),
                                 )
                               ]),
                         ],
