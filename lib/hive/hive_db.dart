@@ -1,6 +1,5 @@
 import 'package:hive/hive.dart';
 import 'package:japan_front/api/api.dart';
-import 'package:japan_front/api/wordNetwork.dart';
 import 'package:japan_front/constants/service_constants.dart';
 import 'package:japan_front/model/Kangi.dart';
 import 'package:japan_front/model/Level.dart';
@@ -89,23 +88,23 @@ class HiveDB {
     List<Part> levelFourPart = List.empty(growable: true);
     List<Part> levelFivePart = List.empty(growable: true);
 
-    await WordNetwork(Api.getKangisByJlptLevel)
-        .getKangisByLevel(http.Client(), "1")
-        .then((value) => levelOne.addAll(value));
+    // await WordNetwork(Api.getWordsByJlptLevel)
+    //     .getKangisByLevel(http.Client(), "1")
+    //     .then((value) => levelOne.addAll(value));
 
-    await WordNetwork(Api.getKangisByJlptLevel)
-        .getKangisByLevel(http.Client(), "2")
-        .then((value) => levelTwo.addAll(value));
-    await WordNetwork(Api.getKangisByJlptLevel)
-        .getKangisByLevel(http.Client(), "3")
-        .then((value) => levelThree.addAll(value));
-    await WordNetwork(Api.getKangisByJlptLevel)
-        .getKangisByLevel(http.Client(), "4")
-        .then((value) => levelFour.addAll(value));
+    // await WordNetwork(Api.getWordsByJlptLevel)
+    //     .getKangisByLevel(http.Client(), "2")
+    //     .then((value) => levelTwo.addAll(value));
+    // await WordNetwork(Api.getWordsByJlptLevel)
+    //     .getKangisByLevel(http.Client(), "3")
+    //     .then((value) => levelThree.addAll(value));
+    // await WordNetwork(Api.getWordsByJlptLevel)
+    //     .getKangisByLevel(http.Client(), "4")
+    //     .then((value) => levelFour.addAll(value));
 
-    await WordNetwork(Api.getKangisByJlptLevel)
-        .getKangisByLevel(http.Client(), "5")
-        .then((value) => levelFive.addAll(value));
+    // await WordNetwork(Api.getWordsByJlptLevel)
+    //     .getKangisByLevel(http.Client(), "5")
+    //     .then((value) => levelFive.addAll(value));
 
     List<int> temp = List.filled(5, 0);
     print(levelOne.sublist(1 * 15, 1 * 15 + 15).length);

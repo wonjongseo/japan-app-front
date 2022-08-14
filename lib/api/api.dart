@@ -1,9 +1,9 @@
 class Api {
-  // static final String baseUrl = "http://localhost:4000";
-  static final String baseUrl = "https://japan-voca.herokuapp.com";
+  static final String baseUrl = "http://localhost:4000";
+  // static final String baseUrl = "https://japan-voca.herokuapp.com";
 
   static String getWords = baseUrl + "/words";
-  static String getKangisByJlptLevel = baseUrl + '/words/level';
+  static String getWordsByJlptLevel = baseUrl + '/words/level';
 
   static String getRelatedWords = baseUrl + '/related/level';
 

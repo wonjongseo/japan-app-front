@@ -17,8 +17,13 @@ class Kangi {
   @HiveField(4)
   final String id;
 
+//  @HiveField(8)
+  // final bool check;
+
   @HiveField(5)
   final String level;
+
+  // 클래스 생성자
 
   const Kangi(
       {required this.japan,

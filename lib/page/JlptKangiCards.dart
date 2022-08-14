@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:japan_front/components/Button.dart';
+import 'package:japan_front/components/CButton.dart';
 import 'package:japan_front/page/Related_Japan.dart';
 import 'package:japan_front/components/CAppber.dart';
-import 'package:japan_front/constants/configs.dart';
 import 'package:japan_front/model/Kangi.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+// ignore: must_be_immutable
 class WordCardPage extends StatefulWidget {
-  final int level;
+  final String level;
   final int step;
+  final SharedPreferences _pref;
   List<Kangi>? kangis;
 
-  WordCardPage(this.level, this.step, this.kangis);
+  WordCardPage(this.level, this.step, this.kangis, this._pref);
 
   @override
   State<WordCardPage> createState() => _WordCardPageState();
@@ -20,18 +22,24 @@ class WordCardPage extends StatefulWidget {
 class _WordCardPageState extends State<WordCardPage> {
   List<bool> isButtonClick = List.filled(3, false);
   int index = 0;
-
   @override
   void initState() {
+    // TODO: implement initState
     super.initState();
-  }
+    print(widget._pref.getStringList("ga"));
+    List<String> next = (widget._pref.getStringList("ga") as List<String>);
+    setState(() {
+      next[widget.step] = "1";
+    });
 
-  void showMessage() {}
+    widget._pref.setStringList("ga", next);
+    print(widget._pref.getStringList("ga"));
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: getCustomAppBar('N${widget.level} - Part${widget.step}'),
+      appBar: getCustomAppBar('${widget.level} - Part${widget.step}'),
       body: Center(
         child: Container(
           child: Column(
@@ -69,7 +77,10 @@ class _WordCardPageState extends State<WordCardPage> {
                   children: [
                     Text(
                       widget.kangis![index].japan,
-                      style: kangiTextStyle,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 130,
+                      ),
                     ),
                   ],
                 ),
@@ -79,6 +90,27 @@ class _WordCardPageState extends State<WordCardPage> {
                   padding: const EdgeInsets.only(left: 10.0),
                   child: Column(
                     children: [
+                      Row(
+                        children: [
+                          ElevatedButton(
+                              style: getCButtonStyle(),
+                              onPressed: () {
+                                setState(() {
+                                  isButtonClick[2] = true;
+                                });
+                              },
+                              child: Text(
+                                '의미',
+                                style: TextStyle(color: Colors.black),
+                              )),
+                          !isButtonClick[2]
+                              ? Text("")
+                              : Container(
+                                  child: Text(widget.kangis![index].korea),
+                                  margin: EdgeInsets.only(left: 10),
+                                ),
+                        ],
+                      ),
                       Row(
                         children: [
                           ElevatedButton(
@@ -117,27 +149,6 @@ class _WordCardPageState extends State<WordCardPage> {
                               ? Text("")
                               : Container(
                                   child: Text(widget.kangis![index].hundoc),
-                                  margin: EdgeInsets.only(left: 10),
-                                ),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          ElevatedButton(
-                              style: getCButtonStyle(),
-                              onPressed: () {
-                                setState(() {
-                                  isButtonClick[2] = true;
-                                });
-                              },
-                              child: Text(
-                                '의미',
-                                style: TextStyle(color: Colors.black),
-                              )),
-                          !isButtonClick[2]
-                              ? Text("")
-                              : Container(
-                                  child: Text(widget.kangis![index].korea),
                                   margin: EdgeInsets.only(left: 10),
                                 ),
                         ],

@@ -10,7 +10,7 @@ class JapanNetwork {
 
   Future<List<Japan>> getJapansByKangiId(http.Client client, String id) async {
     String newUrl = this.url + "/" + id;
-    print(newUrl);
+
     var url = Uri.parse(newUrl);
     var response = await client.get(url);
 

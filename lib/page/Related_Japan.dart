@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:japan_front/api/api.dart';
 import 'package:japan_front/api/japanNetwork.dart';
-import 'package:japan_front/components/Button.dart';
+import 'package:japan_front/components/CButton.dart';
 import 'package:japan_front/components/CAppber.dart';
 import 'package:japan_front/model/Japan.dart';
 import 'package:http/http.dart' as http;

@@ -6,12 +6,12 @@ import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:get/instance_manager.dart';
 import 'package:get/route_manager.dart';
-import 'package:japan_front/api/wordNetworktest.dart';
-import 'package:japan_front/components/Button.dart';
+import 'package:japan_front/api/wordNetwork.dart';
+import 'package:japan_front/components/CButton.dart';
 import 'package:japan_front/components/CAppber.dart';
 import 'package:japan_front/model/Kangi.dart';
-import 'package:japan_front/page/JlptKangiCards.dart';
-import 'package:japan_front/page/kangi-page.dart';
+
+import 'package:japan_front/page/step-page.dart';
 
 class WordsPage extends StatefulWidget {
   const WordsPage({Key? key}) : super(key: key);
@@ -21,40 +21,23 @@ class WordsPage extends StatefulWidget {
 }
 
 class _WordsPageState extends State<WordsPage> {
-  List<String> firstName = [
-    '가',
-    '나',
-    '다',
-    '라',
-    '마',
-    '바',
-    '사',
-    '아',
-    '자',
-    '차',
-    '카',
-    '타',
-    '파',
-    '하',
-    '외'
-  ];
-  List<String> engFirstName = [
-    'ga',
-    'na',
-    'da',
-    'ra',
-    'ma',
-    'ba',
-    'sa',
-    'a',
-    'ja',
-    'tya',
-    'ka',
-    'ta',
-    'pa',
-    'ha',
-    'acc',
-  ];
+  Map<String, String> firstWord = {
+    '가': 'ga',
+    '나': 'na',
+    '다': 'da',
+    '라': 'ra',
+    '마': 'ma',
+    '바': 'ba',
+    '사': 'sa',
+    '아': 'a',
+    '자': 'ja',
+    '차': 'tya',
+    '카': 'ka',
+    '타': 'ta',
+    '파': 'pa',
+    '하': 'ha',
+    '외': 'acc',
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -65,7 +48,7 @@ class _WordsPageState extends State<WordsPage> {
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: GridView.builder(
-          itemCount: firstName.length,
+          itemCount: firstWord.length,
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 3,
             childAspectRatio: 1 / 1.5,
@@ -77,15 +60,15 @@ class _WordsPageState extends State<WordsPage> {
               child: ElevatedButton(
                 style: getCButtonStyle(),
                 onPressed: () async {
-                  List<Kangi> words = await WordNetworkTest()
-                      .getWords(http.Client(), engFirstName[index]);
-
-                  Get.to(
-                      () => StepPage(level: firstName[index], kangis: words));
+                  Get.to(() => StepPage(
+                        appBarTitle: firstWord.keys.elementAt(index),
+                        firstWord: firstWord.values.elementAt(index),
+                      ));
                 },
                 child: Text(
-                  firstName[index],
-                  style: TextStyle(color: Colors.black),
+                  firstWord.keys.elementAt(index),
+                  style: TextStyle(
+                      color: Colors.black, fontWeight: FontWeight.w700),
                 ),
               ),
             );
