@@ -1,6 +1,13 @@
-import 'dart:ffi';
-
+import 'dart:math';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:get/instance_manager.dart';
+import 'package:japan_front/SharedPref.dart';
+import 'package:japan_front/api/baseNetwork.dart';
+import 'package:japan_front/api/wordNetwork.dart';
+import 'package:japan_front/controller/base-controller.dart';
+import 'package:japan_front/controller/progressing-controller.dart';
+import 'package:japan_front/page/Tt.dart';
 import 'package:japan_front/page/n-level.dart';
 import 'package:japan_front/screen/grammer/WordsPage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -11,72 +18,37 @@ class App extends StatefulWidget {
 }
 
 class _AppState extends State<App> with SingleTickerProviderStateMixin {
-  TabController? _tabController;
-
   late SharedPreferences _prefs;
-  Future<void> getSharedPreferences() async {
-    _prefs = await SharedPreferences.getInstance();
-  }
+
+  BaseController baseController = new BaseController();
 
   int _selectedIdx = 0;
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 2, vsync: this);
-    _tabController!.addListener(() {
-      setState(() {
-        _selectedIdx = _tabController!.index;
-      });
-    });
 
-    getSharedPreferences();
-  }
-
-  void start() {
-    if (_prefs.getStringList("ga") == null) {
-      List<String> ga = [];
-      for (int i = 1; i < 24; i++) {
-        print(i);
-        ga.add("0");
-      }
-      _prefs.setStringList("ga", ga);
+  Future<void> getSharedPreferences() async {
+    _prefs = await SharedPreferences.getInstance();
+    if (_prefs.getKeys().toList().length == 0) {
+      print("Setting..");
+      baseController.settingAllWordsAndCnt();
     }
   }
 
   @override
-  void dispose() {
-    _tabController!.dispose();
-    super.dispose();
+  void initState() {
+    super.initState();
+    getSharedPreferences();
   }
 
   @override
   Widget build(BuildContext context) {
+    Get.put(ProgressingController());
     return Scaffold(
-      body: TabBarView(
-        children: [NLevelPage(), WordsPage()],
-        controller: _tabController,
-      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          start();
+          baseController.deleteAllWordsAndCnt();
         },
-        child: Icon(Icons.add),
+        child: Icon(Icons.remove),
       ),
-      bottomNavigationBar: TabBar(
-        tabs: [
-          Tab(
-              child: Text("JPLT",
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: _selectedIdx == 0 ? Colors.blue : Colors.black))),
-          Tab(
-              child: Text("사전순",
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: _selectedIdx == 1 ? Colors.blue : Colors.black)))
-        ],
-        controller: _tabController,
-      ),
+      body: WordsPage(),
     );
   }
 }

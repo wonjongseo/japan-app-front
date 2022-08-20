@@ -7,6 +7,8 @@ class Api {
 
   static String getRelatedWords = baseUrl + '/related/level';
 
+  static String getAllWordsAndCnt = baseUrl + "/all-words";
+
   // static String getRealtedWords = baseUrl + "/word";
 
   //get all by levels
@@ -14,3 +16,12 @@ class Api {
   //get levels by stesp
   static String getJapansByKangiId = baseUrl + '/related';
 }
+
+/*
+
+ㄱ꾸짖을 갈
+마를갈 
+느낄 감
+헤아리 감
+견딜 감
+*/

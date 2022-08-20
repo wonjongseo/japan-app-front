@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:get/get_state_manager/get_state_manager.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
@@ -9,6 +10,7 @@ import 'package:get/route_manager.dart';
 import 'package:japan_front/api/wordNetwork.dart';
 import 'package:japan_front/components/CButton.dart';
 import 'package:japan_front/components/CAppber.dart';
+import 'package:japan_front/controller/progressing-controller.dart';
 import 'package:japan_front/model/Kangi.dart';
 
 import 'package:japan_front/page/step-page.dart';
@@ -40,6 +42,12 @@ class _WordsPageState extends State<WordsPage> {
   };
 
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: getCustomAppBar(
@@ -51,7 +59,7 @@ class _WordsPageState extends State<WordsPage> {
           itemCount: firstWord.length,
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 3,
-            childAspectRatio: 1 / 1.5,
+            childAspectRatio: 1 / 1.2,
             mainAxisSpacing: 15,
             crossAxisSpacing: 15,
           ),

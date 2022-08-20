@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/route_manager.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:japan_front/Palette.dart';
 import 'package:japan_front/hive/hive_db.dart';
+import 'package:japan_front/page/JlptKangiCards.dart';
 import 'package:japan_front/page/app.dart';
 
 void main() async {
@@ -32,7 +32,6 @@ class MyApp extends StatelessWidget {
       themeMode: ThemeMode.light,
       debugShowCheckedModeBanner: false,
       title: "WJS Japan Voca``",
-      // initialBinding: InitBinding(),
       home: App(),
     );
   }

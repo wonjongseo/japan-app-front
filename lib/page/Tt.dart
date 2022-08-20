@@ -6,33 +6,69 @@ import 'package:get/get_state_manager/get_state_manager.dart';
 import 'package:japan_front/api/wordNetwork.dart';
 import 'package:japan_front/components/CButton.dart';
 import 'package:japan_front/components/CAppber.dart';
+import 'package:japan_front/controller/progressing-controller.dart';
 import 'package:japan_front/hive/hive_db.dart';
 import 'package:japan_front/page/step-page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class NLevelPage extends StatelessWidget {
-  const NLevelPage({Key? key}) : super(key: key);
+class TT extends StatefulWidget {
+  @override
+  State<TT> createState() => _TTState();
+}
+
+class _TTState extends State<TT> {
+  late SharedPreferences _pref;
+
+  Map<String, String> firstWord = {
+    '가': 'ga',
+    '나': 'na',
+    '다': 'da',
+    '라': 'ra',
+    '마': 'ma',
+    '바': 'ba',
+    '사': 'sa',
+    '아': 'a',
+    '자': 'ja',
+    '차': 'tya',
+    '카': 'ka',
+    '타': 'ta',
+    '파': 'pa',
+    '하': 'ha',
+    '외': 'acc',
+  };
+
+  void geta() async {
+    _pref = await SharedPreferences.getInstance();
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    geta();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: getCustomAppBar('일본어 단어'),
+      appBar: getCustomAppBar(
+        '사전순',
+      ),
       body: Container(
-        margin: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            _customButton("1", context),
-            _customButton("2", context),
-            _customButton("3", context),
-            _customButton("4", context),
-            _customButton("5", context),
-          ],
+        margin: EdgeInsets.symmetric(vertical: 15, horizontal: 18),
+        child: SingleChildScrollView(
+          child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: List.generate(
+                  firstWord.length,
+                  (index) => _customButton(
+                      firstWord.keys.elementAt(index), context, index))),
         ),
       ),
     );
   }
 
-  Widget _customButton(String level, BuildContext context) {
+  Widget _customButton(String level, BuildContext context, int index) {
     return Container(
       height: Get.width / 4,
       margin: EdgeInsets.symmetric(vertical: 10),
@@ -41,7 +77,8 @@ class NLevelPage extends StatelessWidget {
           onPressed: () async {
             try {
               Get.to(() => StepPage(
-                    appBarTitle: level,
+                    appBarTitle: firstWord.keys.elementAt(index),
+                    firstWord: firstWord.values.elementAt(index),
                   ));
             } on Exception catch (e) {
               print(e);
@@ -60,7 +97,7 @@ class NLevelPage extends StatelessWidget {
                   style: TextStyle(color: Colors.black),
                 ),
                 Text(
-                  'N${level}',
+                  '${level}',
                   style: TextStyle(color: Colors.black),
                 ),
                 Row(
@@ -86,7 +123,7 @@ class NLevelPage extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      'N${level}',
+                      '${level}',
                       style: TextStyle(color: Colors.black),
                     ),
                   ],
